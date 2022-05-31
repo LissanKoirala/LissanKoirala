@@ -3,7 +3,7 @@
 
 ### Current Projects
 
-### [Robot Vision](https://github.com/LissanKoirala/Robot-Vision)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[God's Eye](https://github.com/LissanKoirala/Gods-Eye)
+### [Robot Vision](https://github.com/LissanKoirala/Robot-Vision)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[God's Eye](https://github.com/LissanKoirala/Gods-Eye)&nbsp;&nbsp;&nbsp;<sup><sub>Camera Surveillance</sub></sub>
 
 <img src="https://user-images.githubusercontent.com/58141138/170552999-43cef768-daed-409f-b6eb-d9cc1a2fb5a2.gif" alt="drawing" height="330"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/LissanKoirala/Gods-Eye/blob/main/godseye-demo.gif?raw=true" alt="drawing" height="330"/>
 
