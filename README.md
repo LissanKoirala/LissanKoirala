@@ -10,7 +10,8 @@
 ### [Chatbot](https://lissankoirala.ml/chatbot)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[FileShare](https://fileshare.lissankoirala.ml)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Stock Analyzer/Trader](https://github.com/LissanKoirala/School/tree/main/IA/Proof%20Of%20Concept)&nbsp;&nbsp;&nbsp;<sub><sup>Last trade [PLTR]: 🔻Short @ $166.53</sup></sub>
 
 
-<img src="https://user-images.githubusercontent.com/58141138/171043666-bec3bf19-7946-44cd-b56c-f91d132ae966.gif" alt="drawing" height="380"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/58141138/171046911-664e9254-ac14-4bab-aa09-a847ff01ac8a.gif" alt="drawing" height="380"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/58141138/171060731-0106af86-9f7c-41a2-8d40-e643bbfb9a8e.gif" alt="drawing" height="380"/>
+<img src="https://user-images.githubusercontent.com/58141138/171149439-3b6caba9-1e65-4ba8-8a5b-2a4f55ca13df.gif" alt="drawing" height="380"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/58141138/171149534-365532ab-12ec-4f3c-b923-c90d78ac9a94.gif
+" alt="drawing" height="380"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/58141138/171060731-0106af86-9f7c-41a2-8d40-e643bbfb9a8e.gif" alt="drawing" height="380"/>
 
 
 
