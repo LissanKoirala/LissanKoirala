@@ -15,7 +15,7 @@
 
 
 
-### [Remote-Access Trojan](https://lissankoirala.ml/projects/remote-access)
+### [Remote-Access Trojan](https://lissankoirala.ml/projects/remote-access)&nbsp;&nbsp;&nbsp;<sup><sub>Recently combined with MSDT 0-Day CVE-2022-30190</sub></sub>
 <img src="https://github.com/LissanKoirala/LissanKoirala/blob/main/trojan-globe.gif" alt="drawing" with="100"/>
 
 
