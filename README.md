@@ -19,7 +19,3 @@
 <img src="https://github.com/LissanKoirala/LissanKoirala/blob/main/trojan-globe.gif" alt="drawing" with="100"/>
 
 
-
-![Profile views](https://gpvc.arturio.dev/LissanKoirala)
-
-
