@@ -17,6 +17,9 @@
 <img src="https://github.com/LissanKoirala/LissanKoirala/blob/main/trojan-globe.gif" alt="drawing" with="100"/>
 
 
+Running backtest for trading algorithm
+
+![Screenshot 2022-11-20 134333 cropped](https://user-images.githubusercontent.com/58141138/202905816-fa8ca99b-39dd-45e3-a5d3-580b31d521a1.png)
 
 
 
