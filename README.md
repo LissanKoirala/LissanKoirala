@@ -1,7 +1,12 @@
 
 ## Recent Projects 👨‍💻
 
-### [Robot Vision](https://github.com/LissanKoirala/Robot-Vision)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[God's Eye](https://github.com/LissanKoirala/Gods-Eye)&nbsp;&nbsp;&nbsp;<sup><sub>Camera Surveillance</sub></sub>
+### [Trading Algorithm](https://algo.lissan.dev) (live link) <sub>Under development</sub>
+![algo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/035dd438-7860-43de-bc73-c92dd1900f0e)
+
+
+
+### [Robot Vision](https://github.com/LissanKoirala/Robot-Vision)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[God's Eye](https://github.com/LissanKoirala/Gods-Eye)&nbsp;&nbsp;&nbsp;<sub>Camera Surveillance</sub>
 
 <img src="https://user-images.githubusercontent.com/58141138/170552999-43cef768-daed-409f-b6eb-d9cc1a2fb5a2.gif" alt="drawing" height="330"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/LissanKoirala/Gods-Eye/blob/main/godseye-demo.gif?raw=true" alt="drawing" height="330"/>
 
@@ -16,10 +21,6 @@
 ### [Remote-Access Trojan](https://lissankoirala.ml/projects/remote-access)&nbsp;&nbsp;&nbsp;<sup><sub>Recently combined with [MSDT 0-Day CVE-2022-30190](https://github.com/LissanKoirala/msdt-follina) to deploy the trojan</sub></sub>
 <img src="https://github.com/LissanKoirala/LissanKoirala/blob/main/trojan-globe.gif" alt="drawing" with="100"/>
 
-
-### [Trading Algorithm](https://algo.lissan.dev) (live link)
-
-![Screenshot 2022-11-20 134333 cropped](https://user-images.githubusercontent.com/58141138/202905816-fa8ca99b-39dd-45e3-a5d3-580b31d521a1.png)
 
 
 
