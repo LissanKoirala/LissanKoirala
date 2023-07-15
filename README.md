@@ -1,7 +1,7 @@
 
 ## Recent Projects 👨‍💻
 
-### [Trading Algorithm](https://algo.lissan.dev/positions-dashboard)&nbsp;&nbsp;&nbsp;<sub>Under development</sub>
+### [Trading Algorithm](https://algo.lissan.dev/positions-dashboard)&nbsp;&nbsp;&nbsp;<sub>Under development, click the link to view project live</sub>
 ![algo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/035dd438-7860-43de-bc73-c92dd1900f0e)
 
 
