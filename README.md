@@ -4,7 +4,7 @@
 ### [Trading Algorithm](https://algo.lissan.dev/positions-dashboard)&nbsp;&nbsp;&nbsp;<sub>Under development, (algo.lissan.dev)</sub>
 ![algo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/035dd438-7860-43de-bc73-c92dd1900f0e)
 
-### [Solar System Simulation](https://github.com/LissanKoirala/Solar-System-Simulation)&nbsp;&nbsp;&nbsp;<sub>Paper [PDF](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Paper.pdf)</sub>
+### [Solar System Simulation](https://github.com/LissanKoirala/Solar-System-Simulation)&nbsp;&nbsp;&nbsp;<sub>PDF: [halley-simulation](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Paper.pdf), [kepler-paper](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Kepler-Paper.pdf)</sub>
 ![demo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/d2c69cec-17b6-48d0-8c86-8a6e547802b0)
 
 
