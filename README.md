@@ -4,10 +4,6 @@
 ### [Trading Algorithm](https://algo.lissan.dev/positions-dashboard)&nbsp;&nbsp;&nbsp;<sub>Under development, (algo.lissan.dev)</sub>
 ![algo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/035dd438-7860-43de-bc73-c92dd1900f0e)
 
-### [Solar System Simulation](https://github.com/LissanKoirala/Solar-System-Simulation)&nbsp;&nbsp;&nbsp;<sub>PDF: [halley-simulation](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Paper.pdf), [kepler-paper](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Kepler-Paper.pdf)</sub>
-![demo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/a83cd423-81e2-4959-b126-9a0d14e3f98f)
-
-
 
 
 
@@ -26,6 +22,9 @@
 ### [Remote-Access Trojan](https://lissankoirala.ml/projects/remote-access)&nbsp;&nbsp;&nbsp;<sup><sub>Recently combined with [MSDT 0-Day CVE-2022-30190](https://github.com/LissanKoirala/msdt-follina) to deploy the trojan</sub></sub>
 <img src="https://github.com/LissanKoirala/LissanKoirala/blob/main/trojan-globe.gif" alt="drawing" with="100"/>
 
+
+### [Solar System Simulation](https://github.com/LissanKoirala/Solar-System-Simulation)&nbsp;&nbsp;&nbsp;<sub>PDF: [halley-simulation](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Paper.pdf), [kepler-paper](https://github.com/LissanKoirala/Solar-System-Simulation/blob/main/Kepler-Paper.pdf)</sub>
+![demo](https://github.com/LissanKoirala/LissanKoirala/assets/58141138/a83cd423-81e2-4959-b126-9a0d14e3f98f)
 
 
 
