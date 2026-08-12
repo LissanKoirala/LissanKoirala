@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Quantum Lab</title>
+<style>
+  :root{
+    --bg:#05060c; --bg2:#0a0d1a; --fg:#e6ecff; --mute:#8b93b8;
+    --c1:#7b5cff; --c2:#20e3ff; --c3:#ff5ca8; --line:rgba(123,140,255,.16);
+    --glass:rgba(20,26,50,.55);
+    --font:"Space Grotesk","Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font);overflow-x:hidden;line-height:1.6}
+  #field{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .glow{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;z-index:0;pointer-events:none}
+  .g1{width:520px;height:520px;background:var(--c1);top:-160px;left:-120px}
+  .g2{width:460px;height:460px;background:var(--c2);bottom:-180px;right:-120px;opacity:.35}
+  .g3{width:340px;height:340px;background:var(--c3);top:40%;left:55%;opacity:.22}
+  .wrap{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+  .mono{font-family:var(--mono)}
+  .grad{background:linear-gradient(100deg,var(--c2),var(--c1) 55%,var(--c3));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(14px);
+    background:linear-gradient(180deg,rgba(5,6,12,.82),rgba(5,6,12,.35));
+    border-bottom:1px solid var(--line)}
+  .navin{max-width:1160px;margin:0 auto;padding:16px clamp(18px,4vw,40px);
+    display:flex;justify-content:space-between;align-items:center}
+  .brand{font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--c2);
+    box-shadow:0 0 14px var(--c2);animation:pulse 2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 4px var(--c2);opacity:.6}}
+  .navlinks{display:flex;gap:26px;font-size:14px}
+  .navlinks a{color:var(--mute);text-decoration:none;transition:color .2s}
+  .navlinks a:hover{color:var(--fg)}
+  @media(max-width:620px){.navlinks{display:none}}
+
+  /* hero */
+  header{padding:min(16vw,150px) 0 90px;text-align:center}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);
+    border-radius:999px;padding:7px 16px;font-size:12.5px;color:var(--mute);
+    font-family:var(--mono);background:var(--glass);backdrop-filter:blur(8px)}
+  h1{font-size:clamp(42px,8.5vw,104px);line-height:.98;font-weight:700;letter-spacing:-.03em;margin:28px 0 0}
+  .sub{max-width:60ch;margin:26px auto 0;color:var(--mute);font-size:clamp(16px,2.1vw,20px)}
+  .cta{display:flex;gap:14px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+  .btn{padding:13px 26px;border-radius:12px;font-weight:600;text-decoration:none;font-size:15px;
+    transition:transform .15s,box-shadow .2s;display:inline-flex;gap:8px;align-items:center}
+  .btn.primary{background:linear-gradient(100deg,var(--c1),var(--c3));color:#fff;
+    box-shadow:0 10px 40px -12px var(--c1)}
+  .btn.ghost{border:1px solid var(--line);color:var(--fg);background:var(--glass)}
+  .btn:hover{transform:translateY(-3px)}
+
+  .stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:60px}
+  .stat{background:var(--glass);border:1px solid var(--line);border-radius:16px;
+    padding:20px 26px;min-width:150px;backdrop-filter:blur(10px)}
+  .stat b{display:block;font-size:34px;font-weight:700}
+  .stat span{color:var(--mute);font-size:13px;font-family:var(--mono)}
+
+  /* section */
+  section{padding:70px 0}
+  .shead{display:flex;align-items:center;gap:16px;margin-bottom:36px}
+  .shead .k{font-family:var(--mono);color:var(--c2);font-size:13px}
+  .shead h2{font-size:clamp(28px,4.5vw,44px);font-weight:700;letter-spacing:-.02em}
+  .shead .rule{flex:1;height:1px;background:var(--line)}
+
+  /* project grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+  .card{position:relative;border-radius:20px;padding:26px;overflow:hidden;
+    background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px);
+    transition:transform .25s,border-color .25s;display:flex;flex-direction:column;min-height:250px}
+  .card::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1px;
+    background:linear-gradient(130deg,transparent 30%,var(--edge,var(--c1)),transparent 70%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s}
+  .card:hover{transform:translateY(-6px)}
+  .card:hover::before{opacity:1}
+  .card .yr{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .card h3{font-size:22px;font-weight:700;margin:6px 0 4px;letter-spacing:-.01em}
+  .card .pull{color:var(--c2);font-size:13.5px;font-family:var(--mono);margin-bottom:12px}
+  .card p{color:var(--mute);font-size:14.5px;flex:1}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .tags span{font-size:11px;font-family:var(--mono);color:var(--fg);
+    border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:rgba(255,255,255,.03)}
+  .card a.open{margin-top:16px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none;
+    display:inline-flex;gap:6px;align-items:center;width:max-content}
+  .card a.open:hover{color:var(--c2)}
+  .card a.stretch{position:absolute;inset:0;z-index:1}
+  .card .front{position:relative;z-index:2;pointer-events:none}
+  .card .front a{pointer-events:auto}
+
+  /* skills marquee */
+  .rail{display:flex;gap:12px;flex-wrap:wrap}
+  .rail span{font-family:var(--mono);font-size:13px;color:var(--mute);border:1px solid var(--line);
+    border-radius:999px;padding:8px 15px;background:var(--glass)}
+  .rail span:hover{color:var(--c2);border-color:var(--c2)}
+
+  footer{border-top:1px solid var(--line);padding:60px 0 80px;text-align:center;position:relative;z-index:2}
+  footer h2{font-size:clamp(30px,6vw,64px);font-weight:700;letter-spacing:-.02em}
+  footer .links{display:flex;gap:22px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+  footer a{color:var(--mute);text-decoration:none;font-size:15px}
+  footer a:hover{color:var(--fg)}
+  @media(prefers-reduced-motion:reduce){.dot{animation:none}#field{display:none}}
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+
+<nav>
+  <div class="navin">
+    <div class="brand"><span class="dot"></span>LISSAN<span style="color:var(--mute)">.dev</span></div>
+    <div class="navlinks">
+      <a href="#work">Work</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
+      <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap">
+  <span class="chip"><span class="mono" style="color:var(--c2)">◆</span> agents · quantum · quant · vision</span>
+  <h1>Systems that <span class="grad">act on</span><br>the real world.</h1>
+  <p class="sub">I'm Lissan — an engineer building agents that make decisions, quantum solvers that pick their own strategy, and simulations you can watch run. Below: things that actually shipped.</p>
+  <div class="cta">
+    <a class="btn primary" href="#work">Explore the work →</a>
+    <a class="btn ghost" href="mailto:lissanartist@gmail.com">Get in touch</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><b class="grad">9</b><span>flagship builds</span></div>
+    <div class="stat"><b class="grad">41/49</b><span>quantum circuits cracked</span></div>
+    <div class="stat"><b class="grad">50+</b><span>public repos</span></div>
+    <div class="stat"><b class="grad">4</b><span>hackathons shipped</span></div>
+  </div>
+</header>
+
+<section class="wrap" id="work">
+  <div class="shead"><span class="k">01 //</span><h2>Selected work</h2><span class="rule"></span></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="wrap" id="stack">
+  <div class="shead"><span class="k">02 //</span><h2>The stack</h2><span class="rule"></span></div>
+  <div class="rail" id="rail"></div>
+</section>
+
+<footer id="contact" class="wrap">
+  <div class="chip" style="margin-bottom:22px"><span class="dot"></span> available for interesting problems</div>
+  <h2>Let's build something<br>that <span class="grad">does</span> something.</h2>
+  <div class="links">
+    <a href="mailto:lissanartist@gmail.com">lissanartist@gmail.com</a>
+    <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub</a>
+    <a href="https://lissan.dev">lissan.dev</a>
+    <a href="https://algo.lissan.dev/positions-dashboard" target="_blank" rel="noreferrer">algo.lissan.dev</a>
+  </div>
+</footer>
+
+<script>
+const PROJECTS=[
+  {t:"WorldEval / WorldArena",y:"2026",edge:"var(--c1)",pull:"eval what a model does, not says",
+   d:"An evaluation framework for LLM agents in interactive, deterministic 3D worlds. Three models get partial observations, submit sealed plans, and live with the consequences inside an authoritative Godot simulation.",
+   tags:["Python","Godot 4.5","FastAPI","Agents"],url:"https://github.com/LissanKoirala/WorldEval"},
+  {t:"Quantum Junction",y:"2026",edge:"var(--c2)",pull:"pick the simulator, then solve",
+   d:"A compute-aware pipeline for cracking obfuscated peaked quantum circuits. A selector reads each circuit and routes it to the cheapest attack — statevector, MPS, tensor-network or MPO unswapping. 41/49 solved.",
+   tags:["Qiskit","Tensor nets","Quimb"],url:"https://github.com/LissanKoirala/quantum-junction"},
+  {t:"Advisory Workbench",y:"2026",edge:"var(--c3)",pull:"the agent proposes, the human decides",
+   d:"A provenance-first wealth-advisory workbench built at SwissHacks 2026 for SIX. Watches news against a living client profile and proposes CIO-approved, same-sector swaps — every alert cited, nothing auto-executed.",
+   tags:["Next.js","FastAPI","Fintech"],url:"https://github.com/LissanKoirala/SwissHacks-Six"},
+  {t:"Aurora Visibility",y:"2025",edge:"var(--c2)",pull:"where can you see the lights tonight?",
+   d:"A CASSINI Hackathon pipeline scoring real aurora visibility — fusing the OVATION oval model with Sentinel cloud thickness, cloud-base height and light-pollution layers into interactive maps.",
+   tags:["Sentinel","OVATION","GIS"],url:"https://github.com/LissanKoirala/cassini-hackathon"},
+  {t:"Algo",y:"2026 · active",edge:"var(--c1)",pull:"signals in, positions out",
+   d:"A live algorithmic trading system with a positions dashboard, in active development at algo.lissan.dev.",
+   tags:["Python","Live data","Quant"],url:"https://algo.lissan.dev/positions-dashboard"},
+  {t:"Underground Live Map",y:"2025",edge:"var(--c3)",pull:"watch london move",
+   d:"A live map animating the London Underground and bus network in real time.",
+   tags:["JavaScript","Transit"],url:"https://github.com/LissanKoirala/underground-live-map"},
+  {t:"God's Eye",y:"2024",edge:"var(--c2)",pull:"every camera, one eye",
+   d:"A multi-camera surveillance and person-tracking system, inspired by Fast & Furious.",
+   tags:["OpenCV","Vision"],url:"https://godseye.lissan.dev"},
+  {t:"Solar System Simulation",y:"2023",edge:"var(--c1)",pull:"newton's laws, one step at a time",
+   d:"An N-body simulation used to study how Comet Halley orbits, with Kepler and Halley papers.",
+   tags:["Python","Physics","N-body"],url:"https://github.com/LissanKoirala/Solar-System-Simulation"},
+  {t:"Robot Vision",y:"2022",edge:"var(--c3)",pull:"sight, then motion",
+   d:"A 3D-printed robot controlled programmatically through a computer-vision pipeline.",
+   tags:["Python","OpenCV","Robotics"],url:"https://github.com/LissanKoirala/Robot-Vision"}
+];
+const STACK=["Python","JavaScript","Qiskit","Tensor networks","Godot 4","FastAPI","Next.js","OpenCV","MediaPipe","TensorFlow","Django","Flask","Docker","Linux","MATLAB","Java","SQLite","Git"];
+
+document.getElementById('grid').innerHTML = PROJECTS.map(p=>`
+  <div class="card" style="--edge:${p.edge}">
+    <a class="stretch" href="${p.url}" target="_blank" rel="noreferrer" aria-label="${p.t}"></a>
+    <div class="front" style="display:flex;flex-direction:column;flex:1">
+      <div class="yr">${p.y}</div>
+      <h3>${p.t}</h3>
+      <div class="pull">→ ${p.pull}</div>
+      <p>${p.d}</p>
+      <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      <a class="open" href="${p.url}" target="_blank" rel="noreferrer">View project ↗</a>
+    </div>
+  </div>`).join('');
+document.getElementById('rail').innerHTML = STACK.map(s=>`<span>${s}</span>`).join('');
+
+/* Quantum field: drifting particles wired by proximity */
+const cv=document.getElementById('field'), ctx=cv.getContext('2d');
+let W,H,pts,DPR=Math.min(devicePixelRatio||1,2);
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function resize(){W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  const n=Math.min(90,Math.floor(innerWidth*innerHeight/16000));
+  pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25*DPR,vy:(Math.random()-.5)*.25*DPR,r:(Math.random()*1.6+.6)*DPR}));}
+resize();addEventListener('resize',resize);
+let mx=-9999,my=-9999;
+addEventListener('mousemove',e=>{mx=e.clientX*DPR;my=e.clientY*DPR});
+addEventListener('mouseout',()=>{mx=my=-9999});
+function frame(){
+  ctx.clearRect(0,0,W,H);
+  const R=140*DPR;
+  for(const p of pts){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    const dx=p.x-mx,dy=p.y-my,dm=Math.hypot(dx,dy);
+    if(dm<R*1.4){p.x+=dx/dm*.6;p.y+=dy/dm*.6;}
+  }
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<R){const o=(1-d/R)*.5;ctx.strokeStyle=`rgba(123,140,255,${o})`;ctx.lineWidth=DPR*.6;
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    }
+  }
+  for(const p of pts){
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);
+    ctx.fillStyle='rgba(32,227,255,.85)';ctx.fill();
+  }
+  if(!reduce)requestAnimationFrame(frame);
+}
+if(!reduce)frame(); else { /* draw one static frame */ ctx.globalAlpha=.5;frameOnce(); }
+function frameOnce(){for(const p of pts){ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fillStyle='rgba(123,140,255,.6)';ctx.fill();}}
+</script>
+</body>
+</html>

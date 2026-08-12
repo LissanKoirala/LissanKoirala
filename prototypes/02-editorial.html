@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Selected Works</title>
+<style>
+  :root{
+    --paper:#f4f1ea; --ink:#141414; --mute:#6b665c; --rule:#161616;
+    --accent:#c8442a; --hair:rgba(20,20,20,.14);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+    --sans:"Helvetica Neue",Helvetica,Arial,"Segoe UI",system-ui,sans-serif;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--paper:#12100d;--ink:#ece7db;--mute:#948c7c;--rule:#ece7db;--hair:rgba(236,231,219,.16)}
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;line-height:1.5;
+    text-rendering:optimizeLegibility;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+  .sans{font-family:var(--sans)}
+  .caps{font-family:var(--sans);text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:600}
+  .accent{color:var(--accent)}
+
+  /* masthead */
+  header{border-bottom:2px solid var(--rule);padding:22px 0 14px;position:sticky;top:0;
+    background:var(--paper);z-index:20}
+  .masthead{display:flex;justify-content:space-between;align-items:baseline;gap:20px;flex-wrap:wrap}
+  .logo{font-family:var(--sans);font-weight:800;letter-spacing:-.02em;font-size:20px}
+  nav{display:flex;gap:26px}
+  nav a{color:var(--ink);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  .meta-row{display:flex;justify-content:space-between;border-top:1px solid var(--hair);
+    margin-top:12px;padding-top:8px;color:var(--mute)}
+
+  /* hero */
+  .hero{padding:min(11vw,120px) 0 min(7vw,72px);border-bottom:1px solid var(--hair)}
+  .kicker{margin-bottom:26px}
+  .display{font-weight:400;font-size:clamp(46px,10.5vw,148px);line-height:.94;letter-spacing:-.02em}
+  .display em{font-style:italic}
+  .lede{margin-top:40px;max-width:40ch;font-size:clamp(19px,2.3vw,26px);line-height:1.35}
+  .drop::first-letter{font-size:3.1em;float:left;line-height:.72;padding:.05em .09em 0 0;font-weight:600}
+  .hero-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:48px;align-items:end}
+  .facts{border-top:1px solid var(--hair);padding-top:14px}
+  .facts dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px}
+  .facts dt{color:var(--mute)}
+  .facts dd{text-align:right}
+  @media(max-width:760px){.hero-grid{grid-template-columns:1fr;gap:30px}.facts dd{text-align:left}}
+
+  /* section head */
+  .sec-head{display:flex;align-items:baseline;gap:20px;padding:64px 0 6px}
+  .sec-head h2{font-weight:400;font-size:clamp(26px,4vw,40px);letter-spacing:-.01em}
+  .sec-head .num{font-family:var(--sans);font-weight:700;color:var(--accent);font-size:14px}
+  .sec-head .flex{flex:1;border-bottom:1px solid var(--hair);transform:translateY(-6px)}
+
+  /* works */
+  article.work{display:grid;grid-template-columns:64px 1fr 1fr;gap:30px;
+    padding:34px 0;border-bottom:1px solid var(--hair);align-items:start}
+  article.work:hover .wt{color:var(--accent)}
+  .idx{font-family:var(--sans);font-weight:700;font-size:15px;color:var(--mute);padding-top:8px}
+  .wt{font-weight:400;font-size:clamp(27px,3.4vw,42px);line-height:1.02;letter-spacing:-.015em;
+    transition:color .2s;text-decoration:none;color:var(--ink);display:inline-block}
+  .wyear{font-family:var(--sans);font-size:12px;color:var(--mute);margin-top:12px;letter-spacing:.04em}
+  .wpull{font-style:italic;color:var(--mute);margin:2px 0 12px;font-size:18px}
+  .wbody{font-size:16.5px;line-height:1.55}
+  .wtags{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+  .wtags span{font-family:var(--sans);font-size:11px;letter-spacing:.03em;color:var(--mute);
+    border:1px solid var(--hair);border-radius:999px;padding:3px 10px}
+  .wlink{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--accent);
+    padding-bottom:2px;margin-top:16px;display:inline-block}
+  .wlink:hover{color:var(--accent)}
+  @media(max-width:860px){article.work{grid-template-columns:38px 1fr;gap:16px}
+    .wcol2{grid-column:2}}
+  @media(max-width:560px){article.work{grid-template-columns:1fr}.idx{padding-top:0}.wcol2{grid-column:1}}
+
+  /* colophon */
+  footer{margin-top:70px;border-top:2px solid var(--rule);padding:40px 0 70px}
+  .colo{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px}
+  .colo h3{font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--mute);margin-bottom:14px;font-weight:600}
+  .colo a{color:var(--ink);text-decoration:none;display:block;padding:3px 0}
+  .colo a:hover{color:var(--accent)}
+  .bigmark{font-size:clamp(40px,8vw,96px);letter-spacing:-.02em;line-height:1;margin-bottom:24px}
+  @media(max-width:640px){.colo{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="masthead">
+      <div class="logo">LISSAN&nbsp;KOIRALA</div>
+      <nav class="caps">
+        <a href="#works">Works</a>
+        <a href="#fields">Fields</a>
+        <a href="#colophon">Contact</a>
+      </nav>
+    </div>
+    <div class="meta-row caps">
+      <span>Selected Works &nbsp;·&nbsp; 2020—2026</span>
+      <span>Engineer / Builder</span>
+      <span>lissan.dev</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker caps accent">The Portfolio Edition</div>
+        <h1 class="display">Building<br>things that<br><em>act</em>, not<br>just talk.</h1>
+      </div>
+      <div>
+        <p class="lede drop">Engineer working across AI agents, quantum computing, quantitative trading and computer vision — the kind of problems where the interesting part is whether it actually works.</p>
+        <div class="facts caps" style="margin-top:30px">
+          <dl>
+            <dt>Based</dt><dd>United Kingdom</dd>
+            <dt>Focus</dt><dd>Agents · Quantum · Quant</dd>
+            <dt>Repos</dt><dd>50+ public</dd>
+            <dt>Index</dt><dd>Nine works</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKS -->
+  <div id="works">
+    <div class="sec-head">
+      <span class="num">§ 01</span>
+      <h2>Selected Works</h2>
+      <span class="flex"></span>
+      <span class="caps" style="color:var(--mute)">Nine entries</span>
+    </div>
+    <div id="worklist"></div>
+  </div>
+
+  <!-- FIELDS -->
+  <div id="fields">
+    <div class="sec-head">
+      <span class="num">§ 02</span>
+      <h2>Fields &amp; Instruments</h2>
+      <span class="flex"></span>
+    </div>
+    <div id="fieldgrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair);margin-top:20px"></div>
+  </div>
+</main>
+
+<footer id="colophon">
+  <div class="wrap">
+    <div class="bigmark">Let's build<br>something.</div>
+    <div class="colo">
+      <div>
+        <h3>Colophon</h3>
+        <p style="max-width:44ch;color:var(--mute);font-size:16px">Set in an old-style serif with a neo-grotesque for labels. One accent, plenty of paper, and rules that do the organising. Everything below is real and shipped.</p>
+      </div>
+      <div>
+        <h3>Elsewhere</h3>
+        <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a>
+        <a href="https://lissan.dev">lissan.dev ↗</a>
+        <a href="https://algo.lissan.dev/positions-dashboard" target="_blank" rel="noreferrer">algo.lissan.dev ↗</a>
+      </div>
+      <div>
+        <h3>Correspondence</h3>
+        <a href="mailto:lissanartist@gmail.com">lissanartist@gmail.com</a>
+        <span class="caps" style="color:var(--mute);display:block;margin-top:16px">© 2026</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const WORKS = [
+  {t:"WorldEval / WorldArena",y:"2026",pull:"Evaluate what a model does, not only what it says.",
+   b:"An evaluation framework for LLM agents in interactive, deterministic 3D worlds. Three independently-configured models receive partial observations, submit sealed plans under a commit/lock/reveal protocol, and live with the physical, economic and social consequences inside an authoritative Godot simulation — the model strategises, but never touches physics, damage, resources or scoring.",
+   tags:["Python","Godot 4.5","FastAPI","LLM agents","Research"],url:"https://github.com/LissanKoirala/WorldEval"},
+  {t:"Quantum Junction",y:"2026",pull:"Choose the right simulator before spending the compute.",
+   b:"A compute-aware pipeline for cracking obfuscated peaked quantum circuits, built for the QMill Quantum Peak Challenge. A method selector reads each circuit's structure and routes it to the cheapest attack likely to succeed — exact statevector, Aer MPS, tensor-network contraction or MPO unswapping — solving 41 of 49 challenge circuits.",
+   tags:["Qiskit","Tensor networks","Quimb","Quantum"],url:"https://github.com/LissanKoirala/quantum-junction"},
+  {t:"Advisory Workbench",y:"2026",pull:"The agent proposes, the human decides — every claim cited.",
+   b:"A wealth-advisory workbench for relationship managers, built at SwissHacks 2026 for SIX. It grows a living client profile from CRM history, watches news against it, and — strictly inside the client's mandate — proposes CIO-approved, same-sector swaps with ready-to-use dialogue. Every alert carries a citation back to its source; nothing auto-executes.",
+   tags:["Next.js","FastAPI","Provenance","Fintech"],url:"https://github.com/LissanKoirala/SwissHacks-Six"},
+  {t:"Aurora Visibility Engine",y:"2025",pull:"Where can you really see the northern lights tonight?",
+   b:"A satellite-data pipeline for the CASSINI Hackathon that scores real-world aurora visibility — fusing the OVATION auroral-oval model with Sentinel cloud optical thickness, cloud-base height and urban light-pollution layers into interactive maps.",
+   tags:["Sentinel","OVATION","GIS","Python"],url:"https://github.com/LissanKoirala/cassini-hackathon"},
+  {t:"Algo",y:"2026",pull:"Signals in, positions out.",
+   b:"A live algorithmic trading system with a positions dashboard, under active development at algo.lissan.dev.",
+   tags:["Python","Live data","Quant"],url:"https://algo.lissan.dev/positions-dashboard"},
+  {t:"Underground Live Map",y:"2025",pull:"Watch London move.",
+   b:"A live map animating the London Underground and London bus network in real time.",
+   tags:["JavaScript","Transit","Real-time"],url:"https://github.com/LissanKoirala/underground-live-map"},
+  {t:"God's Eye",y:"2024",pull:"Every camera, one eye.",
+   b:"A multi-camera surveillance and person-tracking system, inspired by the film Fast & Furious.",
+   tags:["OpenCV","Computer vision"],url:"https://godseye.lissan.dev"},
+  {t:"Solar System Simulation",y:"2023",pull:"Newton's laws, one time-step at a time.",
+   b:"An N-body simulation of the solar system used to study how Comet Halley orbits, with accompanying Kepler and Halley papers.",
+   tags:["Python","Physics","N-body"],url:"https://github.com/LissanKoirala/Solar-System-Simulation"},
+  {t:"Robot Vision",y:"2022",pull:"Sight, then motion.",
+   b:"A 3D-printed robot controlled programmatically through a computer-vision pipeline.",
+   tags:["Python","OpenCV","Robotics"],url:"https://github.com/LissanKoirala/Robot-Vision"}
+];
+const FIELDS = [
+  ["Languages","Python · JavaScript · Java · MATLAB · GDScript · SQL"],
+  ["AI / Agents","LLM agents · TensorFlow · OpenCV · MediaPipe"],
+  ["Quantum","Qiskit · Aer · Quimb · tensor networks (MPS / MPO)"],
+  ["Web & Infra","Next.js · FastAPI · Django · Flask · Docker · Linux"],
+  ["Simulation","Godot 4 · N-body physics · GIS / folium"],
+  ["Data","SQLite · pandas · Jupyter · numerical modelling"]
+];
+
+document.getElementById('worklist').innerHTML = WORKS.map((w,i)=>`
+  <article class="work">
+    <div class="idx">${String(i+1).padStart(2,'0')}</div>
+    <div class="wcol1">
+      <a class="wt" href="${w.url}" target="_blank" rel="noreferrer">${w.t}</a>
+      <div class="wyear">${w.y}</div>
+    </div>
+    <div class="wcol2">
+      <div class="wpull">“${w.pull}”</div>
+      <div class="wbody">${w.b}</div>
+      <div class="wtags">${w.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      <a class="wlink" href="${w.url}" target="_blank" rel="noreferrer">Read ↗</a>
+    </div>
+  </article>`).join('');
+
+document.getElementById('fieldgrid').innerHTML = FIELDS.map(([h,b])=>`
+  <div style="background:var(--paper);padding:22px 20px">
+    <div class="caps" style="color:var(--accent);margin-bottom:10px">${h}</div>
+    <div style="font-size:16px;line-height:1.5">${b}</div>
+  </div>`).join('');
+</script>
+</body>
+</html>

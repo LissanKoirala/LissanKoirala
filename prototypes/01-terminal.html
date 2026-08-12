@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — koirala@dev</title>
+<style>
+  :root{
+    --bg:#0a0e0a; --fg:#e8d5a8; --dim:#8a7a52; --amber:#ffb454; --green:#8ec07c;
+    --cyan:#7cd6e0; --red:#fb4934; --sel:#3a3524;
+    --font:ui-monospace,"SF Mono",Menlo,"DejaVu Sans Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--fg);font-family:var(--font);
+    font-size:15px;line-height:1.55;overflow:hidden;
+    background-image:radial-gradient(ellipse at 50% 0%,rgba(255,180,84,.06),transparent 60%);
+  }
+  /* subtle scanlines + flicker */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:9;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px);
+    mix-blend-mode:multiply;opacity:.5;
+  }
+  .screen{
+    height:100%;max-width:900px;margin:0 auto;padding:28px 22px 90px;
+    overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dim) transparent;
+  }
+  .screen::-webkit-scrollbar{width:8px}
+  .screen::-webkit-scrollbar-thumb{background:var(--dim);border-radius:8px}
+  a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)}
+  a:hover{background:var(--sel)}
+  .amber{color:var(--amber)} .green{color:var(--green)} .dim{color:var(--dim)}
+  .red{color:var(--red)} .cyan{color:var(--cyan)}
+  .b{font-weight:700}
+  pre{font-family:var(--font);white-space:pre-wrap;word-break:break-word}
+  .ascii{color:var(--amber);line-height:1.1;font-size:clamp(6px,1.9vw,13px);text-shadow:0 0 12px rgba(255,180,84,.35)}
+  .line{margin:2px 0}
+  .out{margin:6px 0 14px}
+  .prompt-user{color:var(--green)} .prompt-at{color:var(--dim)} .prompt-host{color:var(--amber)} .prompt-path{color:var(--cyan)}
+  .inputline{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .ps1{white-space:nowrap}
+  #cmd{
+    flex:1;min-width:120px;background:transparent;border:none;color:var(--fg);
+    font-family:var(--font);font-size:15px;outline:none;caret-color:var(--amber);
+  }
+  .cursor{display:inline-block;width:9px;height:1.05em;background:var(--amber);
+    vertical-align:text-bottom;animation:blink 1s steps(1) infinite;box-shadow:0 0 8px var(--amber)}
+  @keyframes blink{50%{opacity:0}}
+  table{border-collapse:collapse;margin:4px 0}
+  td{padding:1px 18px 1px 0;vertical-align:top}
+  .tag{display:inline-block;border:1px solid var(--dim);color:var(--dim);border-radius:3px;
+    padding:0 6px;font-size:12px;margin:2px 4px 2px 0}
+  .hint{position:fixed;bottom:0;left:0;right:0;z-index:10;
+    background:linear-gradient(0deg,var(--bg) 70%,transparent);
+    padding:14px 22px;text-align:center;color:var(--dim);font-size:12.5px}
+  .hint b{color:var(--amber)}
+  .kbd{border:1px solid var(--dim);border-radius:4px;padding:0 6px;color:var(--fg)}
+  @media(prefers-reduced-motion:reduce){.cursor{animation:none}body::after{display:none}}
+</style>
+</head>
+<body>
+<div class="screen" id="screen" onclick="focusCmd()">
+  <div id="history"></div>
+  <div class="inputline" id="activeline">
+    <span class="ps1"><span class="prompt-user">visitor</span><span class="prompt-at">@</span><span class="prompt-host">lissan.dev</span><span class="prompt-path">:~$</span></span>
+    <input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input">
+  </div>
+</div>
+<div class="hint">
+  type <b>help</b> · try <b>projects</b>, <b>whoami</b>, <b>ls</b>, <b>open worldeval</b> · <span class="kbd">Tab</span> completes · <span class="kbd">↑</span> history
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const hist = $('#history'), input = $('#cmd'), screen = $('#screen');
+function focusCmd(){ input.focus(); }
+
+const ART = `
+ ██╗     ██╗███████╗███████╗ █████╗ ███╗   ██╗
+ ██║     ██║██╔════╝██╔════╝██╔══██╗████╗  ██║
+ ██║     ██║███████╗███████╗███████║██╔██╗ ██║
+ ██║     ██║╚════██║╚════██║██╔══██║██║╚██╗██║
+ ███████╗██║███████║███████║██║  ██║██║ ╚████║
+ ╚══════╝╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝  KOIRALA`;
+
+const PROJECTS = {
+  worldeval: {
+    title:"WorldEval / WorldArena", year:"2026", tag:["Python","Godot 4.5","FastAPI","LLM agents"],
+    blurb:"An evaluation framework for LLM agents in interactive, deterministic 3D worlds. Three independently-configured models get partial observations, submit sealed plans (commit/lock/reveal), and live with the physical, economic and social consequences inside an authoritative Godot simulation. The LLM strategises; it never touches physics, damage or scoring.",
+    hook:"Evaluate what a model DOES, not only what it says.",
+    link:"https://github.com/LissanKoirala/WorldEval"
+  },
+  quantum: {
+    title:"Quantum Junction — QMill Peak Challenge", year:"2026", tag:["Qiskit","Tensor networks","Quimb","MPS/MPO"],
+    blurb:"A compute-aware pipeline for cracking obfuscated peaked quantum circuits. Rather than brute-forcing every circuit with a bigger simulator, a method selector reads each QASM's structure and routes it to the cheapest attack likely to work — exact statevector, Aer MPS, tensor-network contraction or MPO unswapping. Solved 41/49 challenge circuits.",
+    hook:"Choose the right simulator before spending the compute.",
+    link:"https://github.com/LissanKoirala/quantum-junction"
+  },
+  advisory: {
+    title:"Advisory Workbench — SwissHacks 2026 · SIX", year:"2026", tag:["Next.js","FastAPI","provenance","fintech"],
+    blurb:"A wealth-advisory workbench for relationship managers. It builds a living client profile from CRM history, watches news against it, and — strictly inside the client's mandate — proposes CIO-approved, same-sector swaps plus a ready-to-use dialogue. Every alert carries a citation back to its source. The agent proposes; the RM approves; the client decides.",
+    hook:"The agent proposes, the human decides — every claim cited.",
+    link:"https://github.com/LissanKoirala/SwissHacks-Six"
+  },
+  aurora: {
+    title:"Aurora Visibility — CASSINI Hackathon", year:"2025", tag:["Sentinel","OVATION","GIS","folium"],
+    blurb:"A satellite-data pipeline that scores where the aurora will actually be visible — fusing the OVATION auroral-oval model with Sentinel cloud optical thickness, cloud-base height and urban light-pollution layers into interactive visibility maps.",
+    hook:"Where can you really see the northern lights tonight?",
+    link:"https://github.com/LissanKoirala/cassini-hackathon"
+  },
+  algo: {
+    title:"Algo — algorithmic trading system", year:"2026 · active", tag:["Python","live data","dashboard"],
+    blurb:"A live algorithmic trading stack with a positions dashboard. Under active development.",
+    hook:"Signals in, positions out.",
+    link:"https://algo.lissan.dev/positions-dashboard"
+  },
+  tube: {
+    title:"Underground Live Map", year:"2025", tag:["JavaScript","transit","real-time"],
+    blurb:"A live map of the London Underground and London buses, animating vehicles in real time.",
+    hook:"Watch London move.",
+    link:"https://github.com/LissanKoirala/underground-live-map"
+  },
+  godseye: {
+    title:"God's Eye", year:"2024", tag:["OpenCV","surveillance","computer vision"],
+    blurb:"A multi-camera surveillance / person-tracking system, inspired by the film Fast & Furious.",
+    hook:"Every camera, one eye.",
+    link:"https://godseye.lissan.dev"
+  },
+  solar: {
+    title:"Solar System Simulation", year:"2023", tag:["Python","physics","N-body"],
+    blurb:"An N-body simulation of the solar system, used to study how Comet Halley orbits — with accompanying Kepler and Halley papers.",
+    hook:"Newton's laws, one time-step at a time.",
+    link:"https://github.com/LissanKoirala/Solar-System-Simulation"
+  },
+  robot: {
+    title:"Robot Vision", year:"2022", tag:["Python","OpenCV","robotics"],
+    blurb:"A 3D-printed robot controlled programmatically through a computer-vision pipeline.",
+    hook:"Sight, then motion.",
+    link:"https://github.com/LissanKoirala/Robot-Vision"
+  }
+};
+const ORDER = ["worldeval","quantum","advisory","aurora","algo","tube","godseye","solar","robot"];
+
+const FILES = "about.txt   projects/   skills.json   contact.md   worldeval*   quantum*   now.log";
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function link(url,label){return `<a href="${url}" target="_blank" rel="noreferrer">${label||url}</a>`;}
+
+function projectCard(key){
+  const p = PROJECTS[key];
+  return `<div class="line"><span class="amber b">▸ ${p.title}</span>  <span class="dim">[${p.year}]</span></div>`+
+    `<div class="line dim" style="margin-left:2px">"${p.hook}"</div>`+
+    `<div class="out" style="margin:4px 0 10px">${esc(p.blurb)}<br>`+
+    p.tag.map(t=>`<span class="tag">${t}</span>`).join('')+
+    `<br>${link(p.link)}</div>`;
+}
+
+const COMMANDS = {
+  help(){
+    return `<div class="out"><span class="amber b">Available commands</span>
+<table>
+<tr><td class="green">whoami</td><td>who is this</td></tr>
+<tr><td class="green">about</td><td>the short version</td></tr>
+<tr><td class="green">projects</td><td>list everything I've built</td></tr>
+<tr><td class="green">open &lt;name&gt;</td><td>read one project (e.g. <span class="cyan">open worldeval</span>)</td></tr>
+<tr><td class="green">skills</td><td>languages &amp; tools</td></tr>
+<tr><td class="green">ls</td><td>list files</td></tr>
+<tr><td class="green">contact</td><td>how to reach me</td></tr>
+<tr><td class="green">now</td><td>what I'm working on</td></tr>
+<tr><td class="green">clear</td><td>clear the screen</td></tr>
+<tr><td class="green">theme</td><td>toggle amber / green phosphor</td></tr>
+</table></div>`;
+  },
+  whoami(){
+    return `<div class="out"><span class="amber b">Lissan Koirala</span> — engineer &amp; builder.
+I work across <span class="green">AI agents</span>, <span class="green">quantum computing</span>, <span class="green">quantitative trading</span>, <span class="green">computer vision</span> and <span class="green">physics simulation</span>.
+Most of what's below started as a hackathon, a research question, or "I wonder if I can make this work."</div>`;
+  },
+  about(){ return this.whoami(); },
+  projects(){
+    return `<div class="out"><span class="amber b">${ORDER.length} projects</span> <span class="dim">— type</span> <span class="cyan">open &lt;name&gt;</span> <span class="dim">for detail</span>\n\n`+
+      ORDER.map(k=>{const p=PROJECTS[k];
+        return `<div class="line"><span class="green">${k.padEnd(11,' ')}</span> <span class="amber">${p.title}</span> <span class="dim">[${p.year}]</span></div>`;
+      }).join('')+`</div>`;
+  },
+  open(arg){
+    if(!arg) return `<div class="out red">usage: open &lt;name&gt; — e.g. open quantum</div>`;
+    const key = arg.toLowerCase().replace(/[^a-z]/g,'');
+    const match = ORDER.find(k=>k===key||k.startsWith(key)||PROJECTS[k].title.toLowerCase().includes(key));
+    if(!match) return `<div class="out red">no such project: ${esc(arg)}</div><div class="out dim">try: ${ORDER.join(', ')}</div>`;
+    return `<div class="out">${projectCard(match)}</div>`;
+  },
+  skills(){
+    const groups = {
+      "Languages":["Python","JavaScript","Java","MATLAB","GDScript","SQL","HTML/CSS"],
+      "AI / ML":["PyTorch-era LLM agents","TensorFlow","OpenCV","MediaPipe"],
+      "Quantum":["Qiskit","Aer","Quimb","tensor networks (MPS/MPO)"],
+      "Web / infra":["Next.js","FastAPI","Django","Flask","Docker","Linux","Git"],
+      "Sim / data":["Godot 4","N-body physics","GIS / folium","SQLite"]
+    };
+    return `<div class="out">`+Object.entries(groups).map(([g,arr])=>
+      `<div class="line"><span class="amber b">${g}</span></div><div class="out" style="margin:2px 0 8px">${arr.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`
+    ).join('')+`</div>`;
+  },
+  ls(){ return `<div class="out"><span class="cyan">${FILES}</span></div>`; },
+  contact(){
+    return `<div class="out"><table>
+<tr><td class="green">github</td><td>${link('https://github.com/LissanKoirala','github.com/LissanKoirala')}</td></tr>
+<tr><td class="green">email</td><td>${link('mailto:lissanartist@gmail.com','lissanartist@gmail.com')}</td></tr>
+<tr><td class="green">web</td><td>${link('https://lissan.dev','lissan.dev')}</td></tr>
+</table></div>`;
+  },
+  now(){
+    return `<div class="out"><span class="amber b">~/now.log</span> <span class="dim">(last updated 2026)</span>
+• building <span class="cyan">algo</span> — a live algorithmic trading system (algo.lissan.dev)
+• pushing <span class="cyan">WorldEval</span> toward a full 99-match benchmark season
+• more quantum: from Qiskit Fall Fest London to the Fujitsu quantum challenge</div>`;
+  },
+  theme(){
+    document.body.classList.toggle('green-mode');
+    const on = document.body.classList.contains('green-mode');
+    if(on){ document.documentElement.style.setProperty('--amber','#8ec07c');
+            document.documentElement.style.setProperty('--fg','#b8f0a0'); }
+    else  { document.documentElement.style.setProperty('--amber','#ffb454');
+            document.documentElement.style.setProperty('--fg','#e8d5a8'); }
+    return `<div class="out dim">phosphor set to ${on?'green':'amber'}.</div>`;
+  },
+  clear(){ hist.innerHTML=''; return ''; },
+  sudo(){ return `<div class="out dim">nice try.</div>`; },
+  exit(){ return `<div class="out dim">there is no exit. only more projects.</div>`; }
+};
+const CMDLIST = Object.keys(COMMANDS).concat(['open']);
+
+function banner(){
+  hist.insertAdjacentHTML('beforeend',
+    `<pre class="ascii">${ART}</pre>`+
+    `<div class="out" style="margin-top:10px">Portfolio shell — <span class="dim">v3.0 · lissan.dev</span><br>`+
+    `type <span class="green b">help</span> to begin, or <span class="green b">projects</span> to jump straight in.</div>`);
+}
+
+let cmdHist = JSON.parse(sessionStorage.getItem('ch')||'[]'), hp = cmdHist.length;
+
+function run(raw){
+  const cmd = raw.trim();
+  const psHTML = `<span class="prompt-user">visitor</span><span class="prompt-at">@</span><span class="prompt-host">lissan.dev</span><span class="prompt-path">:~$</span>`;
+  hist.insertAdjacentHTML('beforeend', `<div class="line">${psHTML} <span>${esc(cmd)}</span></div>`);
+  if(cmd){ cmdHist.push(cmd); sessionStorage.setItem('ch',JSON.stringify(cmdHist.slice(-40))); }
+  hp = cmdHist.length;
+  if(!cmd){ return; }
+  const [name,...rest] = cmd.split(/\s+/);
+  const fn = COMMANDS[name.toLowerCase()];
+  let out;
+  if(fn) out = fn.call(COMMANDS, rest.join(' '));
+  else out = `<div class="out red">command not found: ${esc(name)}</div><div class="out dim">type <span class="green">help</span> for options.</div>`;
+  if(out) hist.insertAdjacentHTML('beforeend', out);
+  screen.scrollTop = screen.scrollHeight;
+}
+
+input.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ run(input.value); input.value=''; screen.scrollTop=screen.scrollHeight; }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); if(hp>0){hp--;input.value=cmdHist[hp]||'';} }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); if(hp<cmdHist.length){hp++;input.value=cmdHist[hp]||'';} }
+  else if(e.key==='Tab'){ e.preventDefault();
+    const v=input.value.trim().toLowerCase();
+    if(v){ const m=CMDLIST.filter(c=>c.startsWith(v)); if(m.length===1) input.value=m[0]+' '; }
+  }
+});
+
+banner();
+focusCmd();
+window.addEventListener('click',()=>{ if(!window.getSelection().toString()) focusCmd(); });
+</script>
+</body>
+</html>

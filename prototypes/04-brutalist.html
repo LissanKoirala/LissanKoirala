@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LISSAN KOIRALA ///  BUILDS STUFF</title>
+<style>
+  :root{
+    --bg:#ffe600; --ink:#111; --paper:#fff;
+    --pink:#ff5da2; --blue:#2b6bff; --green:#00d18f; --purple:#9b5cff; --orange:#ff6b35;
+    --shadow:6px 6px 0 var(--ink);
+    --shadow-lg:10px 10px 0 var(--ink);
+    --font:"Arial Black","Arial Bold",Arial,Helvetica,sans-serif;
+    --body:"Courier New",ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);
+    background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px);
+    background-size:44px 44px;background-position:-1px -1px;
+    background-blend-mode:normal;}
+  body::before{content:"";position:fixed;inset:0;background:var(--bg);opacity:.94;z-index:-1}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+  a{color:inherit}
+  .blk{font-family:var(--font);text-transform:uppercase;letter-spacing:-.02em;line-height:.9}
+
+  /* marquee */
+  .marquee{background:var(--ink);color:var(--bg);overflow:hidden;white-space:nowrap;
+    border-bottom:4px solid var(--ink);position:sticky;top:0;z-index:50;font-family:var(--font);
+    text-transform:uppercase;font-size:15px;padding:9px 0;letter-spacing:.04em}
+  .mq{display:inline-block;padding-left:100%;animation:mq 22s linear infinite}
+  .mq span{margin:0 26px}
+  @keyframes mq{to{transform:translateX(-100%)}}
+
+  /* nav */
+  nav{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;
+    max-width:1180px;margin:0 auto;flex-wrap:wrap;gap:12px}
+  .logo{font-family:var(--font);font-size:26px;text-transform:uppercase;
+    background:var(--paper);border:3px solid var(--ink);box-shadow:var(--shadow);padding:6px 14px}
+  .navlinks{display:flex;gap:10px;flex-wrap:wrap}
+  .navlinks a{font-family:var(--font);font-size:13px;text-transform:uppercase;text-decoration:none;
+    background:var(--paper);border:3px solid var(--ink);padding:9px 14px;box-shadow:3px 3px 0 var(--ink);
+    transition:transform .1s,box-shadow .1s}
+  .navlinks a:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .navlinks a.pink{background:var(--pink)} .navlinks a.blue{background:var(--blue);color:#fff}
+
+  /* hero */
+  .hero{padding:40px 0 30px}
+  .hero h1{font-family:var(--font);text-transform:uppercase;font-size:clamp(48px,13vw,150px);
+    line-height:.82;letter-spacing:-.03em}
+  .hero h1 .hl{background:var(--pink);padding:0 .08em;display:inline-block;border:4px solid var(--ink);
+    box-shadow:var(--shadow);transform:rotate(-1.5deg);margin:8px 0}
+  .hero h1 .hl2{background:var(--green);border:4px solid var(--ink);box-shadow:var(--shadow);
+    padding:0 .08em;display:inline-block;transform:rotate(1.5deg)}
+  .heroband{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+  .heroband div{background:var(--paper);border:3px solid var(--ink);box-shadow:var(--shadow);
+    padding:12px 18px;font-weight:bold;font-size:15px}
+  .heroband .b1{background:var(--blue);color:#fff}
+  .heroband .b2{background:var(--orange)}
+  .heroband .b3{background:var(--purple);color:#fff}
+  .intro{margin-top:26px;max-width:60ch;font-size:18px;line-height:1.55;font-weight:bold;
+    background:var(--paper);border:3px solid var(--ink);box-shadow:var(--shadow);padding:18px 22px}
+
+  /* section title */
+  .stitle{font-family:var(--font);text-transform:uppercase;font-size:clamp(30px,6vw,58px);
+    margin:60px 0 22px;display:inline-block;background:var(--ink);color:var(--bg);padding:6px 18px;
+    box-shadow:var(--shadow);transform:rotate(-1deg)}
+
+  /* project cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:26px}
+  .card{background:var(--paper);border:4px solid var(--ink);box-shadow:var(--shadow-lg);
+    padding:22px;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s;
+    position:relative}
+  .card:hover{transform:translate(-4px,-4px);box-shadow:14px 14px 0 var(--ink)}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .card .num{font-family:var(--font);font-size:40px;line-height:.8;-webkit-text-stroke:2px var(--ink);
+    color:transparent}
+  .card .yr{font-family:var(--font);font-size:12px;background:var(--ink);color:var(--bg);padding:5px 9px;
+    white-space:nowrap}
+  .card h3{font-family:var(--font);text-transform:uppercase;font-size:24px;margin:14px 0 6px;line-height:.95}
+  .card .pull{font-weight:bold;font-size:14px;background:var(--hl,#ffe600);border:2px solid var(--ink);
+    padding:4px 8px;display:inline-block;margin-bottom:12px}
+  .card p{font-size:14.5px;line-height:1.5;flex:1;font-weight:bold}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+  .chips span{font-family:var(--font);font-size:10px;text-transform:uppercase;border:2px solid var(--ink);
+    padding:4px 8px;background:var(--bg)}
+  .card a.go{font-family:var(--font);text-transform:uppercase;font-size:14px;text-decoration:none;
+    background:var(--ink);color:var(--bg);padding:12px;text-align:center;
+    border:3px solid var(--ink);box-shadow:3px 3px 0 var(--pink);transition:box-shadow .1s,transform .1s}
+  .card a.go:hover{box-shadow:5px 5px 0 var(--pink);transform:translate(-1px,-1px)}
+  .card:nth-child(6n+1){--hl:var(--pink)} .card:nth-child(6n+2){--hl:var(--green)}
+  .card:nth-child(6n+3){--hl:var(--blue);color-scheme:only}
+  .card:nth-child(6n+3) .pull{background:var(--blue);color:#fff}
+  .card:nth-child(6n+4){--hl:var(--orange)} .card:nth-child(6n+5){--hl:var(--purple)}
+  .card:nth-child(6n+5) .pull{background:var(--purple);color:#fff}
+  .card:nth-child(6n) .pull{background:var(--green)}
+
+  /* skills */
+  .skillwrap{display:flex;flex-wrap:wrap;gap:12px}
+  .skill{font-family:var(--font);text-transform:uppercase;font-size:16px;
+    border:3px solid var(--ink);padding:10px 16px;box-shadow:var(--shadow);background:var(--paper)}
+  .skill:nth-child(4n+1){background:var(--pink)} .skill:nth-child(4n+2){background:var(--green)}
+  .skill:nth-child(4n+3){background:var(--blue);color:#fff} .skill:nth-child(4n){background:var(--orange)}
+
+  /* footer */
+  footer{margin:70px 0 40px;background:var(--ink);color:var(--bg);border:4px solid var(--ink);
+    box-shadow:var(--shadow-lg);padding:40px 26px}
+  footer h2{font-family:var(--font);text-transform:uppercase;font-size:clamp(34px,8vw,80px);line-height:.85}
+  .fbtns{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+  .fbtns a{font-family:var(--font);text-transform:uppercase;font-size:15px;text-decoration:none;
+    background:var(--bg);color:var(--ink);border:3px solid var(--bg);padding:12px 18px;
+    box-shadow:4px 4px 0 var(--pink);transition:transform .1s}
+  .fbtns a:hover{transform:translate(-3px,-3px)}
+  @media(prefers-reduced-motion:reduce){.mq{animation:none;padding-left:0}}
+</style>
+</head>
+<body>
+<div class="marquee"><div class="mq">
+  <span>★ LISSAN KOIRALA</span><span>AI AGENTS</span><span>★ QUANTUM COMPUTING</span><span>ALGO TRADING</span><span>★ COMPUTER VISION</span><span>PHYSICS SIMS</span><span>★ HACKATHON HABITUAL</span><span>BUILDS THINGS THAT WORK</span><span>★ LISSAN KOIRALA</span><span>AI AGENTS</span><span>★ QUANTUM COMPUTING</span><span>ALGO TRADING</span><span>★ COMPUTER VISION</span><span>PHYSICS SIMS</span><span>★ HACKATHON HABITUAL</span><span>BUILDS THINGS THAT WORK</span>
+</div></div>
+
+<nav>
+  <div class="logo">L.K</div>
+  <div class="navlinks">
+    <a href="#work" class="pink">Work</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact" class="blue">Contact</a>
+    <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section class="hero">
+    <h1 class="blk">I BUILD<br><span class="hl">SYSTEMS</span> THAT<br><span class="hl2">DO STUFF.</span></h1>
+    <div class="heroband">
+      <div class="b1">AI AGENTS</div>
+      <div class="b2">QUANTUM</div>
+      <div class="b3">QUANT TRADING</div>
+      <div>COMPUTER VISION</div>
+    </div>
+    <p class="intro">Hi — I'm <b>Lissan Koirala</b>. I make agents that decide, quantum solvers that pick their own strategy, and trading systems that actually run. If it's a hard problem and no one's sure it'll work, that's the one I want. Everything below shipped.</p>
+  </section>
+
+  <h2 class="stitle" id="work">THE WORK ↓</h2>
+  <div class="cards" id="cards"></div>
+
+  <h2 class="stitle" id="skills">TOOLS I SWING ↓</h2>
+  <div class="skillwrap" id="skills-list"></div>
+
+  <footer id="contact">
+    <h2>WANNA<br>BUILD?</h2>
+    <p style="font-weight:bold;font-size:18px;margin-top:16px;max-width:50ch">Got a hard problem, a hackathon team, or a wild idea? Let's go.</p>
+    <div class="fbtns">
+      <a href="mailto:lissanartist@gmail.com">EMAIL ME</a>
+      <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GITHUB</a>
+      <a href="https://lissan.dev">LISSAN.DEV</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const P=[
+  {t:"WORLDEVAL",y:"2026",pull:"eval what a model DOES",d:"A framework that tests LLM agents in deterministic 3D worlds. Three models get partial views, submit sealed plans, and live with the consequences inside a Godot sim — the model strategises, it never touches the physics or the score.",tags:["Python","Godot","FastAPI"],url:"https://github.com/LissanKoirala/WorldEval"},
+  {t:"QUANTUM JUNCTION",y:"2026",pull:"pick sim, then crack",d:"Cracks obfuscated peaked quantum circuits by reading each one and routing it to the cheapest attack — statevector, MPS, tensor-network or MPO unswapping. 41 of 49 circuits solved.",tags:["Qiskit","Tensor nets","Quimb"],url:"https://github.com/LissanKoirala/quantum-junction"},
+  {t:"ADVISORY WORKBENCH",y:"2026",pull:"agent proposes, human decides",d:"SwissHacks 2026 build for SIX. Watches news against a living client profile and proposes CIO-approved, same-sector swaps. Every alert is cited. Nothing auto-executes.",tags:["Next.js","FastAPI","Fintech"],url:"https://github.com/LissanKoirala/SwissHacks-Six"},
+  {t:"AURORA VISIBILITY",y:"2025",pull:"see the lights tonight?",d:"CASSINI Hackathon. Scores where the aurora is actually visible by fusing the OVATION oval model with Sentinel cloud thickness, cloud-base height and light-pollution layers.",tags:["Sentinel","OVATION","GIS"],url:"https://github.com/LissanKoirala/cassini-hackathon"},
+  {t:"ALGO",y:"2026",pull:"signals in, positions out",d:"A live algorithmic trading system with a positions dashboard. Under active development at algo.lissan.dev.",tags:["Python","Live data","Quant"],url:"https://algo.lissan.dev/positions-dashboard"},
+  {t:"UNDERGROUND MAP",y:"2025",pull:"watch london move",d:"A live map animating the London Underground and bus network in real time.",tags:["JavaScript","Transit"],url:"https://github.com/LissanKoirala/underground-live-map"},
+  {t:"GOD'S EYE",y:"2024",pull:"every camera, one eye",d:"A multi-camera surveillance and person-tracking system, inspired by Fast & Furious.",tags:["OpenCV","Vision"],url:"https://godseye.lissan.dev"},
+  {t:"SOLAR SYSTEM SIM",y:"2023",pull:"newton, one step at a time",d:"An N-body simulation used to study how Comet Halley orbits, with Kepler and Halley papers.",tags:["Python","Physics"],url:"https://github.com/LissanKoirala/Solar-System-Simulation"},
+  {t:"ROBOT VISION",y:"2022",pull:"sight, then motion",d:"A 3D-printed robot controlled programmatically through a computer-vision pipeline.",tags:["Python","OpenCV","Robotics"],url:"https://github.com/LissanKoirala/Robot-Vision"}
+];
+const SKILLS=["Python","JavaScript","Qiskit","Godot","FastAPI","Next.js","OpenCV","TensorFlow","Django","Flask","Docker","Linux","MATLAB","Java","Tensor Nets","Git"];
+
+document.getElementById('cards').innerHTML=P.map((p,i)=>`
+  <div class="card">
+    <div class="top"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="yr">${p.y}</span></div>
+    <h3>${p.t}</h3>
+    <span class="pull">▶ ${p.pull}</span>
+    <p>${p.d}</p>
+    <div class="chips">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    <a class="go" href="${p.url}" target="_blank" rel="noreferrer">OPEN →</a>
+  </div>`).join('');
+document.getElementById('skills-list').innerHTML=SKILLS.map(s=>`<div class="skill">${s}</div>`).join('');
+</script>
+</body>
+</html>
