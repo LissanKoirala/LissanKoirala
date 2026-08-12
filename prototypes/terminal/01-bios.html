@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LISSAN BIOS — Setup Utility</title>
+<style>
+  :root{
+    --blue:#0000a8; --blue2:#0000c8; --cyan:#00a8a8; --ltcyan:#54fcfc;
+    --white:#fcfcfc; --gray:#a8a8a8; --yellow:#fcfc54; --green:#54fc54; --red:#fc5454;
+    --mono:"IBM Plex Mono",ui-monospace,"Courier New",Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:#000;color:var(--gray);font-family:var(--mono);font-size:15px;line-height:1.45;
+    overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #crt{width:100%;height:100%;max-width:1100px;max-height:760px;position:relative;
+    background:#000;overflow:hidden}
+  #crt::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:20;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 4px)}
+  /* POST screen */
+  #post{position:absolute;inset:0;padding:26px 30px;color:var(--gray);white-space:pre-wrap;z-index:5;
+    background:#000}
+  #post .w{color:var(--white)} #post .g{color:var(--green)} #post .y{color:var(--yellow)}
+  #post .c{color:var(--ltcyan)}
+  .cursor{display:inline-block;width:9px;height:1.05em;background:var(--gray);vertical-align:text-bottom;
+    animation:bl 1s steps(1) infinite}
+  @keyframes bl{50%{opacity:0}}
+  /* SETUP screen */
+  #setup{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;
+    background:var(--blue);color:var(--gray);padding:0}
+  #setup.on{display:flex}
+  .titlebar{background:var(--gray);color:var(--blue);text-align:center;font-weight:bold;padding:2px}
+  .subbar{text-align:center;color:var(--ltcyan);padding:2px 0 8px}
+  .frame{flex:1;display:flex;gap:0;padding:0 16px 8px;min-height:0}
+  .col{border:1px solid var(--gray);margin:4px;display:flex;flex-direction:column;min-height:0}
+  .colhead{background:var(--gray);color:var(--blue);text-align:center;font-weight:bold}
+  .left{flex:0 0 42%;overflow:auto}
+  .right{flex:1;padding:10px 14px;overflow:auto;color:var(--white)}
+  .menu{list-style:none;padding:4px 0}
+  .menu li{padding:3px 14px;display:flex;justify-content:space-between;cursor:pointer}
+  .menu li .val{color:var(--ltcyan)}
+  .menu li.sel{background:var(--gray);color:var(--blue)}
+  .menu li.sel .val{color:var(--blue2)}
+  .right h3{color:var(--yellow);margin-bottom:6px}
+  .right .pull{color:var(--ltcyan);margin-bottom:12px}
+  .right .field{display:flex;margin:2px 0}
+  .right .field .k{color:var(--gray);width:110px;flex:none}
+  .right .field .v{color:var(--white)}
+  .right .tags{margin-top:12px;color:var(--green)}
+  .right a{color:var(--yellow);text-decoration:underline}
+  .helpbar{border:1px solid var(--gray);margin:0 20px 10px;padding:6px 12px;color:var(--gray)}
+  .helpbar .k{color:var(--white);background:var(--cyan);padding:0 5px;margin-right:4px}
+  .footer{text-align:center;color:var(--ltcyan);padding-bottom:6px;font-size:13px}
+  @media (prefers-reduced-motion:reduce){.cursor{animation:none}#crt::after{display:none}}
+  @media(max-width:640px){body{font-size:12px}.left{flex-basis:48%}}
+</style>
+</head>
+<body>
+<div id="crt">
+  <pre id="post"></pre>
+
+  <div id="setup">
+    <div class="titlebar">LISSAN BIOS SETUP UTILITY  —  Copyright (C) 2020-2026  Lissan Koirala</div>
+    <div class="subbar">◄ Main │ Projects │ Skills │ Contact ►</div>
+    <div class="frame">
+      <div class="col left">
+        <div class="colhead">System Inventory</div>
+        <ul class="menu" id="menu"></ul>
+      </div>
+      <div class="col right" id="detail"></div>
+    </div>
+    <div class="helpbar">
+      <span class="k">↑↓</span>Select Item&nbsp;&nbsp;<span class="k">Enter</span>Open Link&nbsp;&nbsp;<span class="k">F10</span>Reboot POST&nbsp;&nbsp;<span class="k">Esc</span>Exit
+    </div>
+    <div class="footer" id="clock"></div>
+  </div>
+</div>
+
+<script>
+const P=[
+ {name:'WorldEval / WorldArena',year:'2026',size:'agents',tags:['Python','Godot 4.5','FastAPI','LLM agents'],pull:'Evaluate what a model does, not only what it says.',desc:'An evaluation framework for LLM agents in deterministic 3D worlds — three models get partial views, submit sealed plans, and live with the consequences inside an authoritative Godot simulation.',url:'https://github.com/LissanKoirala/WorldEval'},
+ {name:'Quantum Junction',year:'2026',size:'quantum',tags:['Qiskit','Tensor networks','Quimb'],pull:'Choose the right simulator before spending the compute.',desc:'A compute-aware pipeline for cracking obfuscated peaked quantum circuits. Reads each circuit and routes it to the cheapest attack — statevector, MPS, tensor-network or MPO unswapping. 41/49 solved.',url:'https://github.com/LissanKoirala/quantum-junction'},
+ {name:'Advisory Workbench',year:'2026',size:'fintech',tags:['Next.js','FastAPI','Provenance'],pull:'The agent proposes, the human decides — every claim cited.',desc:'A provenance-first wealth-advisory workbench built at SwissHacks 2026 for SIX. Watches news against a living client profile and proposes CIO-approved, same-sector swaps. Nothing auto-executes.',url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {name:'Aurora Visibility',year:'2025',size:'geo',tags:['Sentinel','OVATION','GIS'],pull:'Where can you really see the northern lights tonight?',desc:'A CASSINI Hackathon pipeline that scores real aurora visibility — fusing the OVATION oval model with Sentinel cloud optical thickness, cloud-base height and light-pollution layers.',url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {name:'Algo',year:'2026',size:'quant',tags:['Python','Live data','Quant'],pull:'Signals in, positions out.',desc:'A live algorithmic trading system with a positions dashboard, in active development at algo.lissan.dev.',url:'https://algo.lissan.dev/positions-dashboard'},
+ {name:'Underground Live Map',year:'2025',size:'transit',tags:['JavaScript','Real-time'],pull:'Watch London move.',desc:'A live map animating the London Underground and London bus network in real time.',url:'https://github.com/LissanKoirala/underground-live-map'},
+ {name:"God's Eye",year:'2024',size:'vision',tags:['OpenCV','Vision'],pull:'Every camera, one eye.',desc:'A multi-camera surveillance and person-tracking system, inspired by the film Fast & Furious.',url:'https://godseye.lissan.dev'},
+ {name:'Solar System Simulation',year:'2023',size:'physics',tags:['Python','N-body'],pull:"Newton's laws, one time-step at a time.",desc:'An N-body simulation of the solar system, used to study how Comet Halley orbits — with Kepler and Halley papers.',url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {name:'Robot Vision',year:'2022',size:'robotics',tags:['Python','OpenCV','Robotics'],pull:'Sight, then motion.',desc:'A 3D-printed robot controlled programmatically through a computer-vision pipeline.',url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+
+const postEl=document.getElementById('post');
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const LINES=[
+ {t:'LISSAN BIOS (C) 2020-2026 Lissan Koirala',c:'w'},
+ {t:'BIOS Date: 08/12/26   Ver: 3.14.159',c:''},
+ {t:'',c:''},
+ {t:'Main Processor : Human Engineer @ 3.6 GHz curiosity',c:''},
+ {t:'MEM_COUNT',c:''},           // special: animate memory
+ {t:'',c:''},
+ {t:'Detecting IDE drives ...',c:''},
+ {t:'  Primary Master  : AGENTS-SSD   (WorldEval, Advisory)',c:'g'},
+ {t:'  Primary Slave   : QUANTUM-DISK (Qiskit, tensor nets)',c:'g'},
+ {t:'  Secondary Master: QUANT-ARRAY  (algo, trading)',c:'g'},
+ {t:'  Secondary Slave : VISION-VOL   (God’s Eye, Robot)',c:'g'},
+ {t:'',c:''},
+ {t:'Initializing USB Controllers .. Done.',c:''},
+ {t:'9 Storage Devices found. 4 Hackathons cached.',c:'c'},
+ {t:'',c:''},
+ {t:'Press <DEL> or wait to enter SETUP ...',c:'y'}
+];
+let li=0,buf='';
+function typeLines(){
+  if(reduce){ // dump instantly
+    buf=LINES.map(l=> l.t==='MEM_COUNT' ? 'Memory Test : 65536K OK' : wrap(l)).join('\n');
+    postEl.innerHTML=buf; setTimeout(enterSetup,300); return;
+  }
+  if(li>=LINES.length){ postEl.innerHTML=buf+'<span class="cursor"></span>'; setTimeout(enterSetup,900); return; }
+  const l=LINES[li];
+  if(l.t==='MEM_COUNT'){ animateMem(()=>{li++;typeLines();}); return; }
+  buf+=wrap(l)+'\n'; postEl.innerHTML=buf+'<span class="cursor"></span>'; li++;
+  setTimeout(typeLines, l.t==='' ? 60 : 150);
+}
+function wrap(l){ return l.c? `<span class="${l.c}">${l.t}</span>` : l.t; }
+function animateMem(done){
+  let m=1024; const target=65536;
+  const base=buf;
+  const step=()=>{ postEl.innerHTML=base+`Memory Test : ${m}K OK`+'\n'+'<span class="cursor"></span>';
+    m+=4096; if(m>=target){ buf=base+'Memory Test : 65536K OK\n'; done(); } else setTimeout(step,40); };
+  step();
+}
+
+const setupEl=document.getElementById('setup');
+let sel=0;
+function enterSetup(){
+  document.getElementById('post').style.display='none';
+  setupEl.classList.add('on');
+  buildMenu(); render(); tick();
+}
+function buildMenu(){
+  document.getElementById('menu').innerHTML=P.map((p,i)=>
+    `<li data-i="${i}" class="${i===sel?'sel':''}"><span>${p.name.slice(0,24)}</span><span class="val">[${p.year}]</span></li>`).join('');
+  document.querySelectorAll('#menu li').forEach(li=>{
+    li.onclick=()=>{sel=+li.dataset.i;refresh();};
+    li.ondblclick=()=>window.open(P[sel].url,'_blank');
+  });
+}
+function refresh(){document.querySelectorAll('#menu li').forEach((li,i)=>li.classList.toggle('sel',i===sel));render();}
+function render(){
+  const p=P[sel];
+  document.getElementById('detail').innerHTML=`
+    <h3>${p.name}</h3>
+    <div class="pull">"${p.pull}"</div>
+    <div class="field"><span class="k">Item Type</span><span class="v">${p.size}</span></div>
+    <div class="field"><span class="k">Detected</span><span class="v">${p.year}</span></div>
+    <div class="field"><span class="k">Status</span><span class="v" style="color:var(--green)">ENABLED / SHIPPED</span></div>
+    <div style="margin:12px 0;color:var(--white)">${p.desc}</div>
+    <div class="tags">Drivers: ${p.tags.join(' · ')}</div>
+    <div style="margin-top:14px"><a href="${p.url}" target="_blank" rel="noreferrer">&gt; Open device ↗</a></div>`;
+}
+function tick(){
+  const el=document.getElementById('clock');
+  if(el) el.textContent='System Time  '+new Date().toLocaleTimeString()+'   |   v18.x  |  lissan.dev';
+  setTimeout(tick,1000);
+}
+addEventListener('keydown',e=>{
+  if(!setupEl.classList.contains('on'))return;
+  if(e.key==='ArrowDown'){sel=(sel+1)%P.length;refresh();e.preventDefault();}
+  else if(e.key==='ArrowUp'){sel=(sel-1+P.length)%P.length;refresh();e.preventDefault();}
+  else if(e.key==='Enter'){window.open(P[sel].url,'_blank');}
+  else if(e.key==='F10'){location.reload();}
+});
+typeLines();
+</script>
+</body>
+</html>

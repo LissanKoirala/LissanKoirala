@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>portfolio.py — VIM</title>
+<style>
+  :root{
+    --bg:#1e1f1c; --gutter:#272822; --fg:#f8f8f2; --mute:#75715e;
+    --pink:#f92672; --green:#a6e22e; --blue:#66d9ef; --orange:#fd971f; --purple:#ae81ff; --yellow:#e6db74;
+    --sel:#3e3d32; --status:#a6e22e; --statustxt:#1e1f1c;
+    --mono:"IBM Plex Mono",ui-monospace,"JetBrains Mono","Fira Code",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:14px;overflow:hidden;line-height:1.5}
+  .app{height:100%;display:flex;flex-direction:column}
+  .tabline{background:#191a17;display:flex;font-size:13px;flex:none}
+  .tabline .tab{padding:6px 16px;color:var(--mute);border-right:1px solid #000}
+  .tabline .tab.on{background:var(--bg);color:var(--fg)}
+  .tabline .sp{flex:1}
+  .tabline .who{padding:6px 16px;color:var(--mute)}
+  .editor{flex:1;display:flex;overflow:hidden}
+  .gutter{background:var(--gutter);color:var(--mute);text-align:right;padding:8px 10px 8px 14px;
+    user-select:none;flex:none;overflow:hidden}
+  .gutter div{height:21px}
+  .code{flex:1;overflow-y:auto;padding:8px 14px;scrollbar-width:thin;scrollbar-color:var(--sel) transparent;outline:none}
+  .code::-webkit-scrollbar{width:9px}.code::-webkit-scrollbar-thumb{background:var(--sel)}
+  .ln{height:21px;white-space:pre;cursor:default}
+  .ln.cur{background:var(--sel);border-radius:2px}
+  .ln.fold{cursor:pointer}
+  .ln.fold:hover{background:var(--sel)}
+  .kw{color:var(--pink)} .fn{color:var(--green)} .str{color:var(--yellow)} .num{color:var(--purple)}
+  .var{color:var(--blue)} .cm{color:var(--mute)} .op{color:var(--pink)} .cls{color:var(--blue)}
+  .foldmark{color:var(--mute)} .decor{color:var(--orange)}
+  a{color:var(--yellow)}
+  .status{flex:none;background:var(--status);color:var(--statustxt);font-weight:bold;
+    display:flex;justify-content:space-between;padding:2px 12px}
+  .status .r{display:flex;gap:18px}
+  .cmdline{flex:none;background:var(--bg);color:var(--fg);padding:3px 12px;min-height:24px;border-top:1px solid #000}
+  .cmdline input{background:transparent;border:none;color:var(--fg);font:inherit;outline:none;width:90%}
+  .help{color:var(--mute)}
+  @media(max-width:640px){body{font-size:12px}.tabline .who{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="tabline">
+    <div class="tab on">portfolio.py</div>
+    <div class="tab">README.md</div>
+    <div class="tab">skills.json</div>
+    <div class="sp"></div>
+    <div class="who">~/lissan.dev</div>
+  </div>
+  <div class="editor">
+    <div class="gutter" id="gutter"></div>
+    <div class="code" id="code" tabindex="0"></div>
+  </div>
+  <div class="status">
+    <div><span id="mode">NORMAL</span> &nbsp; portfolio.py [+]</div>
+    <div class="r"><span class="help">j/k or ↑↓ move · Enter open · za fold · :help</span><span>utf-8</span><span>python</span><span id="pos">1:1</span></div>
+  </div>
+  <div class="cmdline" id="cmdline"><span class="help">press <b>:</b> for command mode — try :ls, :open quantum, :help</span></div>
+</div>
+
+<script>
+const P=[
+ {key:'worldeval',fn:'world_eval',t:'WorldEval / WorldArena',yr:2026,pull:'Evaluate what a model does, not only what it says.',ret:'godot_sim',tags:['Python','Godot','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval',
+   desc:'LLM agents in deterministic 3D worlds: sealed plans, real consequences, an authoritative Godot simulation.'},
+ {key:'quantum',fn:'quantum_junction',t:'Quantum Junction',yr:2026,pull:'Choose the right simulator before spending the compute.',ret:'bitstring',tags:['Qiskit','TensorNets','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction',
+   desc:'Reads each obfuscated peaked circuit, routes it to the cheapest attack. 41/49 solved.'},
+ {key:'advisory',fn:'advisory_workbench',t:'Advisory Workbench',yr:2026,pull:'The agent proposes, the human decides.',ret:'cited_swap',tags:['Next.js','FastAPI'],url:'https://github.com/LissanKoirala/SwissHacks-Six',
+   desc:'SwissHacks 2026 for SIX: provenance-first wealth advisory. Every alert cited; nothing auto-executes.'},
+ {key:'aurora',fn:'aurora_visibility',t:'Aurora Visibility',yr:2025,pull:'Where can you actually see the aurora tonight?',ret:'visibility_map',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon',
+   desc:'CASSINI Hackathon: OVATION oval fused with Sentinel cloud & light-pollution data.'},
+ {key:'algo',fn:'algo',t:'Algo',yr:2026,pull:'Signals in, positions out.',ret:'positions',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard',
+   desc:'A live algorithmic trading system with a positions dashboard.'},
+ {key:'tube',fn:'underground_map',t:'Underground Live Map',yr:2025,pull:'Watch London move.',ret:'live_map',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map',
+   desc:'A live map of the Tube and London buses in real time.'},
+ {key:'godseye',fn:'gods_eye',t:"God's Eye",yr:2024,pull:'Every camera, one eye.',ret:'tracks',tags:['OpenCV'],url:'https://godseye.lissan.dev',
+   desc:'Multi-camera surveillance & person tracking, inspired by Fast & Furious.'},
+ {key:'solar',fn:'solar_system',t:'Solar System Simulation',yr:2023,pull:"Newton's laws, one time-step at a time.",ret:'orbits',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation',
+   desc:'N-body simulation studying Comet Halley\'s orbit, with papers.'},
+ {key:'robot',fn:'robot_vision',t:'Robot Vision',yr:2022,pull:'Sight, then motion.',ret:'motion',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision',
+   desc:'A 3D-printed robot controlled programmatically through a CV pipeline.'}
+];
+
+// Build source lines. Each is {html, url?, fold?} ; folded projects collapse their body.
+const folds={}; // key -> collapsed?
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function buildLines(){
+  const L=[];
+  const push=(html,meta={})=>L.push(Object.assign({html},meta));
+  push(`<span class="cm">#!/usr/bin/env python3</span>`);
+  push(`<span class="cm"># lissan.dev — everything I've built, as a source file.</span>`);
+  push(`<span class="cm"># Move with j/k. Press Enter on a def to open it. Press za to fold.</span>`);
+  push(``);
+  push(`<span class="kw">from</span> <span class="var">lissan</span> <span class="kw">import</span> <span class="fn">engineer</span>, <span class="fn">curiosity</span>`);
+  push(``);
+  push(`<span class="var">FOCUS</span> <span class="op">=</span> [<span class="str">"agents"</span>, <span class="str">"quantum"</span>, <span class="str">"quant"</span>, <span class="str">"vision"</span>]`);
+  push(``);
+  P.forEach(p=>{
+    const collapsed=folds[p.key];
+    push(`<span class="decor">@shipped</span>(<span class="str">"${p.yr}"</span>)`,{key:p.key});
+    if(collapsed){
+      push(`<span class="foldmark">+--${'-'.repeat(4)}</span> <span class="kw">def</span> <span class="fn">${p.fn}</span>(): <span class="cm"># ${p.t} … folded (za)</span>`,{key:p.key,fold:true,def:true,url:p.url});
+      push(``);
+      return;
+    }
+    push(`<span class="kw">def</span> <span class="fn">${p.fn}</span>() <span class="op">-></span> <span class="cls">${p.ret}</span>:`,{key:p.key,fold:true,def:true,url:p.url});
+    push(`    <span class="str">"""${p.t} — ${esc(p.pull)}"""</span>`,{url:p.url});
+    push(`    <span class="cm"># ${esc(p.desc)}</span>`,{url:p.url});
+    push(`    <span class="var">stack</span> <span class="op">=</span> [${p.tags.map(t=>`<span class="str">"${t}"</span>`).join(', ')}]`,{url:p.url});
+    push(`    <span class="kw">return</span> <span class="fn">open</span>(<span class="str">"${p.url}"</span>)  <span class="cm"># ↵ Enter to visit</span>`,{url:p.url});
+    push(``);
+  });
+  push(`<span class="kw">if</span> <span class="var">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span>:`);
+  push(`    <span class="fn">engineer</span>().<span class="fn">build</span>(<span class="var">FOCUS</span>)  <span class="cm"># hi — I'm Lissan 👋</span>`);
+  return L;
+}
+
+let lines=buildLines(), cur=0;
+const codeEl=document.getElementById('code'), gutterEl=document.getElementById('gutter');
+function render(){
+  gutterEl.innerHTML=lines.map((_,i)=>`<div>${i+1}</div>`).join('');
+  codeEl.innerHTML=lines.map((l,i)=>{
+    const cls=['ln']; if(i===cur)cls.push('cur'); if(l.fold)cls.push('fold');
+    return `<div class="${cls.join(' ')}" data-i="${i}">${l.html||' '}</div>`;
+  }).join('');
+  codeEl.querySelectorAll('.ln').forEach(el=>{
+    const i=+el.dataset.i;
+    el.onclick=()=>{cur=i;syncPos();highlight();};
+    el.ondblclick=()=>activate(i);
+  });
+  // sync gutter scroll
+  codeEl.onscroll=()=>gutterEl.style.transform=`translateY(${-codeEl.scrollTop}px)`;
+  syncPos();
+}
+function highlight(){codeEl.querySelectorAll('.ln').forEach((el,i)=>el.classList.toggle('cur',i===cur));
+  const el=codeEl.querySelector('.ln.cur'); if(el)el.scrollIntoView({block:'nearest'});}
+function syncPos(){document.getElementById('pos').textContent=(cur+1)+':1';}
+function activate(i){
+  const l=lines[i];
+  if(l&&l.def&&folds[keyAt(i)]!==undefined){ /* def line: open url */ }
+  if(l&&l.url){ window.open(l.url,'_blank'); flash(`opening ${l.url}`); }
+}
+function keyAt(i){return lines[i]&&lines[i].key;}
+function toggleFold(){
+  const l=lines[cur]; const key=l&&l.key;
+  if(key){ folds[key]=!folds[key]; const wasAt=cur; lines=buildLines();
+    cur=Math.min(wasAt,lines.length-1); render(); flash(folds[key]?`folded ${key}`:`unfolded ${key}`); }
+  else flash('no fold here');
+}
+function move(d){cur=Math.max(0,Math.min(lines.length-1,cur+d));highlight();syncPos();}
+
+// key handling (vim-ish)
+let mode='normal';
+const cmdEl=document.getElementById('cmdline');
+addEventListener('keydown',e=>{
+  if(mode==='cmd')return; // input handles it
+  if(e.key===':'){enterCmd();e.preventDefault();return;}
+  if(e.key==='j'||e.key==='ArrowDown'){move(1);e.preventDefault();}
+  else if(e.key==='k'||e.key==='ArrowUp'){move(-1);e.preventDefault();}
+  else if(e.key==='g'){cur=0;highlight();syncPos();}
+  else if(e.key==='G'){cur=lines.length-1;highlight();syncPos();}
+  else if(e.key==='Enter'){activate(cur);}
+  else if(e.key==='z'){window._z=true;setTimeout(()=>window._z=false,400);}
+  else if(e.key==='a'&&window._z){toggleFold();window._z=false;}
+});
+function flash(msg){cmdEl.innerHTML=`<span class="help">${esc(msg)}</span>`;}
+function enterCmd(){
+  mode='cmd';document.getElementById('mode').textContent='COMMAND';
+  cmdEl.innerHTML=`:<input id="cmdinp" autocomplete="off" spellcheck="false" aria-label="vim command">`;
+  const ci=document.getElementById('cmdinp');ci.focus();
+  ci.addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'){runCmd(ci.value.trim());exitCmd();}
+    else if(ev.key==='Escape'){exitCmd();}
+  });
+}
+function exitCmd(){mode='normal';document.getElementById('mode').textContent='NORMAL';
+  cmdEl.innerHTML=`<span class="help">press <b>:</b> for command mode — try :ls, :open quantum, :help</span>`;codeEl.focus();}
+function runCmd(c){
+  const [cmd,...rest]=c.split(/\s+/);const arg=rest.join(' ').toLowerCase();
+  if(cmd==='help')flash('commands: :ls  :open <name>  :about  :skills  :contact  :q — or j/k, Enter, za');
+  else if(cmd==='ls')flash('projects: '+P.map(p=>p.key).join(', '));
+  else if(cmd==='open'){const p=P.find(x=>x.key===arg||x.fn.includes(arg)||x.t.toLowerCase().includes(arg));if(p){window.open(p.url,'_blank');flash('opening '+p.t);}else flash('E: no project "'+arg+'"');}
+  else if(cmd==='about')flash("Lissan Koirala — engineer across agents, quantum, quant & vision.");
+  else if(cmd==='skills')flash('Python · JS · Qiskit · Godot · FastAPI · Next.js · OpenCV · tensor networks');
+  else if(cmd==='contact')flash('github.com/LissanKoirala · lissanartist@gmail.com · lissan.dev');
+  else if(cmd==='q'||cmd==='q!'||cmd==='wq')flash("there is no quitting the portfolio :) try :open <name>");
+  else flash('E492: Not an editor command: '+esc(cmd));
+}
+render();codeEl.focus();
+</script>
+</body>
+</html>

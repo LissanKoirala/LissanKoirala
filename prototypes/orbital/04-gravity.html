@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Gravity</title>
+<style>
+  :root{--bg:#050806;--fg:#d8ffe6;--mute:#5f8a72;--green:#4dff9e;--font:"Space Grotesk","Segoe UI",system-ui,sans-serif;--mono:ui-monospace,"JetBrains Mono",Menlo,monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font)}
+  canvas{position:fixed;inset:0;cursor:crosshair}
+  .grid{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(77,255,158,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(77,255,158,.06) 1px,transparent 1px);
+    background-size:40px 40px}
+  .top{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;padding:20px clamp(16px,4vw,34px);pointer-events:none}
+  .brand{font-weight:700;pointer-events:auto;font-family:var(--mono)}.brand small{color:var(--mute);font-weight:400}
+  .top .r{display:flex;gap:20px;pointer-events:auto;font-size:14px;font-family:var(--mono)}.top a{color:var(--mute);text-decoration:none}.top a:hover{color:var(--fg)}
+  .intro{position:fixed;left:clamp(16px,4vw,44px);top:50%;transform:translateY(-50%);max-width:330px;z-index:8;transition:opacity .5s}
+  .intro.hide{opacity:0;pointer-events:none}
+  .intro .k{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:.1em}
+  .intro h1{font-size:clamp(30px,5vw,50px);line-height:1.03;font-weight:700;margin:14px 0;letter-spacing:-.02em}
+  .intro p{color:var(--mute);font-size:15px;line-height:1.6}
+  .intro .hint{margin-top:20px;font-family:var(--mono);font-size:12.5px;color:var(--green);display:flex;gap:8px;align-items:center}
+  .pulse{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pl 1.8s infinite}
+  @keyframes pl{50%{opacity:.3}}
+  .panel{position:fixed;top:0;right:0;height:100%;width:min(430px,92vw);z-index:12;
+    background:linear-gradient(200deg,rgba(8,24,16,.96),rgba(4,8,6,.98));backdrop-filter:blur(16px);
+    border-left:1px solid rgba(77,255,158,.28);transform:translateX(100%);transition:transform .42s cubic-bezier(.5,.1,.2,1);
+    padding:76px clamp(22px,4vw,38px) 40px;overflow-y:auto}
+  .panel.open{transform:none}
+  .panel .close{position:absolute;top:22px;right:24px;background:none;border:1px solid var(--mute);color:var(--fg);width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer}
+  .panel .yr{font-family:var(--mono);font-size:13px;color:var(--green)}
+  .panel h2{font-size:28px;font-weight:700;margin:8px 0 6px}
+  .panel .pull{font-style:italic;color:var(--green);margin-bottom:16px}
+  .panel p{color:#cfe8d9;font-size:15px;line-height:1.65}
+  .panel .tags{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0}
+  .panel .tags span{font-family:var(--mono);font-size:11.5px;border:1px solid rgba(77,255,158,.3);border-radius:6px;padding:4px 9px}
+  .panel a.v{display:inline-flex;gap:8px;background:linear-gradient(100deg,#22c974,#4dff9e);color:#04140b;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:11px;font-size:14.5px}
+  .hud{position:fixed;left:34px;bottom:26px;z-index:8;font-family:var(--mono);font-size:12px;color:var(--mute);pointer-events:none;line-height:1.9}
+  .hud b{color:var(--green)}
+  .ctrls{position:fixed;right:20px;bottom:22px;z-index:9;display:flex;gap:8px}
+  .ctrls button{background:rgba(8,24,16,.8);border:1px solid rgba(77,255,158,.25);color:var(--fg);font-family:var(--mono);
+    font-size:12px;padding:8px 12px;border-radius:9px;cursor:pointer}
+  .ctrls button:hover{border-color:var(--green)}
+  .dock{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:9;display:flex;gap:6px;
+    background:rgba(8,20,14,.72);border:1px solid rgba(77,255,158,.2);backdrop-filter:blur(10px);border-radius:14px;padding:7px;max-width:70vw;overflow-x:auto;scrollbar-width:none}
+  .dock::-webkit-scrollbar{display:none}
+  .dock button{background:none;border:none;color:var(--mute);font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:9px;cursor:pointer;white-space:nowrap;display:flex;gap:6px;align-items:center}
+  .dock button:hover{color:var(--fg)}.dock .d{width:8px;height:8px;border-radius:50%}
+  @media(max-width:640px){.intro{top:auto;bottom:150px;transform:none}.intro.hide{transform:translateY(20px)}.hud{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="grid"></div>
+<div class="top">
+  <div class="brand">LISSAN_KOIRALA <small>/ gravity</small></div>
+  <div class="r"><a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a><a href="mailto:lissanartist@gmail.com">Contact</a></div>
+</div>
+<div class="intro" id="intro">
+  <div class="k">// N-BODY SANDBOX</div>
+  <h1>Nine bodies.<br>One law of<br>attraction.</h1>
+  <p>Real gravity: each project orbits the central mass. Grab one and fling it into a new orbit — click (don't drag) to open it. A nod to the solar-system sim.</p>
+  <div class="hint"><span class="pulse"></span> drag to fling · click to open</div>
+</div>
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="close">✕</button>
+  <div class="yr" id="yr"></div><h2 id="ti"></h2><div class="pull" id="pu"></div>
+  <p id="bd"></p><div class="tags" id="tg"></div>
+  <a class="v" id="vi" target="_blank" rel="noreferrer">Visit project ↗</a>
+</aside>
+<div class="hud" id="hud"></div>
+<div class="ctrls">
+  <button id="reset">⟲ reset orbits</button>
+  <button id="pause">⏸ pause</button>
+</div>
+<div class="dock" id="dock"></div>
+
+<script>
+const P=[
+ {t:'WorldEval / WorldArena',col:'#4dff9e',yr:'2026',m:2.0,pull:'Evaluate what a model does, not only what it says.',d:'LLM agents in deterministic 3D worlds — sealed plans, real consequences, an authoritative Godot simulation.',tags:['Python','Godot 4.5','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval'},
+ {t:'Quantum Junction',col:'#5fe0ff',yr:'2026',m:1.7,pull:'Choose the right simulator before spending the compute.',d:'Reads each obfuscated peaked quantum circuit and routes it to the cheapest attack. 41/49 solved.',tags:['Qiskit','Tensor nets','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction'},
+ {t:'Advisory Workbench',col:'#ff6ec7',yr:'2026',m:1.7,pull:'The agent proposes, the human decides — every claim cited.',d:'SwissHacks 2026 for SIX — a provenance-first wealth-advisory workbench. Nothing auto-executes.',tags:['Next.js','FastAPI','Fintech'],url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {t:'Aurora Visibility',col:'#8bffc8',yr:'2025',m:1.4,pull:'Where can you really see the aurora tonight?',d:'CASSINI Hackathon: OVATION oval fused with Sentinel cloud & light-pollution data.',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {t:'Algo',col:'#ffcf6b',yr:'2026',m:1.4,pull:'Signals in, positions out.',d:'A live algorithmic trading system with a positions dashboard.',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard'},
+ {t:'Underground Live Map',col:'#9db4ff',yr:'2025',m:1.2,pull:'Watch London move.',d:'A live map of the Tube and London buses in real time.',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map'},
+ {t:"God's Eye",col:'#d6a6ff',yr:'2024',m:1.2,pull:'Every camera, one eye.',d:'Multi-camera surveillance & person tracking, inspired by Fast & Furious.',tags:['OpenCV'],url:'https://godseye.lissan.dev'},
+ {t:'Solar System Simulation',col:'#ffd479',yr:'2023',m:1.5,pull:"Newton's laws, one time-step at a time.",d:'An N-body simulation studying Comet Halley\'s orbit, with papers.',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {t:'Robot Vision',col:'#ff9f7a',yr:'2022',m:1.2,pull:'Sight, then motion.',d:'A 3D-printed robot controlled programmatically through a computer-vision pipeline.',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+const c=document.getElementById('c'),x=c.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2),cx,cy;
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let stars=[],GM,paused=false;
+function resize(){W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
+  cx=W/2;cy=H/2;GM=Math.min(W,H)*Math.min(W,H)*0.00028;
+  stars=Array.from({length:Math.floor(W*H/12000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1*DPR+.2,b:Math.random()*.4+.1}));}
+resize();addEventListener('resize',()=>{const wasW=W,wasH=H;resize();});
+
+function seed(){
+  const base=Math.min(W,H);
+  P.forEach((p,i)=>{
+    const R=(0.14+0.36*(i/(P.length-1)))*base;   // spread radii
+    const a=Math.random()*Math.PI*2;
+    p.x=cx+Math.cos(a)*R; p.y=cy+Math.sin(a)*R;
+    const v=Math.sqrt(GM/R);                       // circular orbit speed
+    const dir=(i%2?1:-1);                          // alternate directions
+    p.vx=-Math.sin(a)*v*dir; p.vy=Math.cos(a)*v*dir;
+    p.trail=[];
+  });
+}
+resize();seed();
+
+let hover=-1,drag=-1,lastx=0,lasty=0,downx=0,downy=0,vhistory=[];
+function step(){
+  if(paused||reduce)return;
+  const dt=1.0;
+  for(const p of P){
+    if(P.indexOf(p)===drag)continue;
+    const dx=cx-p.x,dy=cy-p.y,r2=dx*dx+dy*dy,r=Math.sqrt(r2);
+    const soft=Math.max(r,26*DPR);
+    const a=GM/(soft*soft);
+    p.vx+=dx/r*a*dt; p.vy+=dy/r*a*dt;
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    p.trail.push({x:p.x,y:p.y}); if(p.trail.length>46)p.trail.shift();
+  }
+}
+function draw(){
+  step();
+  x.fillStyle='rgba(5,8,6,0.30)';x.fillRect(0,0,W,H); // motion blur trail on bg
+  for(const s of stars){x.globalAlpha=s.b;x.fillStyle='#4dff9e';x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill();}x.globalAlpha=1;
+  // central mass
+  const g=x.createRadialGradient(cx,cy,0,cx,cy,60*DPR);
+  g.addColorStop(0,'rgba(220,255,235,.95)');g.addColorStop(.4,'rgba(77,255,158,.5)');g.addColorStop(1,'transparent');
+  x.fillStyle=g;x.beginPath();x.arc(cx,cy,60*DPR,0,7);x.fill();
+  x.fillStyle='#eafff2';x.font=`700 ${13*DPR}px var(--mono),monospace`;x.textAlign='center';x.fillText('★',cx,cy+5*DPR);
+  P.forEach((p,i)=>{
+    // trail
+    x.strokeStyle=p.col;x.lineWidth=DPR;
+    for(let k=1;k<p.trail.length;k++){x.globalAlpha=(k/p.trail.length)*0.5;
+      x.beginPath();x.moveTo(p.trail[k-1].x,p.trail[k-1].y);x.lineTo(p.trail[k].x,p.trail[k].y);x.stroke();}
+    x.globalAlpha=1;
+    const rad=(hover===i||drag===i?11:7)*DPR;
+    const gg=x.createRadialGradient(p.x,p.y,0,p.x,p.y,rad*3);gg.addColorStop(0,p.col);gg.addColorStop(1,'transparent');
+    x.globalAlpha=(hover===i?.7:.45);x.fillStyle=gg;x.beginPath();x.arc(p.x,p.y,rad*3,0,7);x.fill();x.globalAlpha=1;
+    x.fillStyle='#fff';x.beginPath();x.arc(p.x,p.y,rad*.55,0,7);x.fill();
+    x.strokeStyle=p.col;x.lineWidth=DPR*1.6;x.beginPath();x.arc(p.x,p.y,rad,0,7);x.stroke();
+    if(hover===i||drag===i){x.fillStyle='#d8ffe6';x.font=`600 ${12*DPR}px var(--mono),monospace`;x.textAlign='left';
+      x.fillText(p.t,p.x+rad+7*DPR,p.y+4*DPR);}
+  });
+  // drag aim line
+  if(drag>=0){x.strokeStyle='rgba(255,255,255,.4)';x.setLineDash([4*DPR,4*DPR]);x.lineWidth=DPR;
+    x.beginPath();x.moveTo(cx,cy);x.lineTo(P[drag].x,P[drag].y);x.stroke();x.setLineDash([]);}
+  updateHud();
+  requestAnimationFrame(draw);
+}
+draw();
+function updateHud(){const el=document.getElementById('hud');if(!el)return;
+  let ke=0;P.forEach(p=>ke+=0.5*(p.vx*p.vx+p.vy*p.vy)/(DPR*DPR));
+  el.innerHTML=`bodies <b>${P.length}</b> · G·M <b>${(GM/1e3).toFixed(1)}k</b> · ΣKE <b>${(ke).toFixed(0)}</b>${paused?' · <b>PAUSED</b>':''}`;}
+
+function hit(mx,my){let b=-1,bd=1e9;P.forEach((p,i)=>{const d=Math.hypot(mx-p.x,my-p.y);if(d<18*DPR&&d<bd){bd=d;b=i;}});return b;}
+c.addEventListener('mousemove',e=>{const mx=e.clientX*DPR,my=e.clientY*DPR;
+  if(drag>=0){vhistory.push({x:mx,y:my,t:performance.now()});if(vhistory.length>5)vhistory.shift();
+    P[drag].x=mx;P[drag].y=my;P[drag].trail=[];return;}
+  hover=hit(mx,my);c.style.cursor=hover>=0?'grab':'crosshair';});
+c.addEventListener('mousedown',e=>{const mx=e.clientX*DPR,my=e.clientY*DPR;const h=hit(mx,my);
+  if(h>=0){drag=h;downx=mx;downy=my;vhistory=[{x:mx,y:my,t:performance.now()}];c.style.cursor='grabbing';}});
+addEventListener('mouseup',e=>{if(drag<0)return;const mx=e.clientX*DPR,my=e.clientY*DPR;
+  const moved=Math.hypot(mx-downx,my-downy);
+  if(moved<5*DPR){open(drag);} else { // impart velocity from recent motion
+    const a=vhistory[0],b=vhistory[vhistory.length-1];const dt=Math.max(16,b.t-a.t);
+    P[drag].vx=(b.x-a.x)/dt*16*0.9;P[drag].vy=(b.y-a.y)/dt*16*0.9;}
+  drag=-1;c.style.cursor='crosshair';});
+// touch
+c.addEventListener('touchstart',e=>{const t=e.touches[0];const mx=t.clientX*DPR,my=t.clientY*DPR;const h=hit(mx,my);
+  if(h>=0){drag=h;downx=mx;downy=my;vhistory=[{x:mx,y:my,t:performance.now()}];}},{passive:true});
+c.addEventListener('touchmove',e=>{if(drag<0)return;const t=e.touches[0];const mx=t.clientX*DPR,my=t.clientY*DPR;
+  vhistory.push({x:mx,y:my,t:performance.now()});if(vhistory.length>5)vhistory.shift();P[drag].x=mx;P[drag].y=my;P[drag].trail=[];e.preventDefault();},{passive:false});
+c.addEventListener('touchend',e=>{if(drag<0)return;const b=vhistory[vhistory.length-1],a=vhistory[0];
+  const moved=Math.hypot(b.x-downx,b.y-downy);
+  if(moved<6*DPR){open(drag);}else{const dt=Math.max(16,b.t-a.t);P[drag].vx=(b.x-a.x)/dt*16*0.9;P[drag].vy=(b.y-a.y)/dt*16*0.9;}
+  drag=-1;});
+
+document.getElementById('reset').onclick=()=>seed();
+document.getElementById('pause').onclick=(e)=>{paused=!paused;e.target.textContent=paused?'▶ play':'⏸ pause';};
+
+const panel=document.getElementById('panel');
+function open(i){const p=P[i];
+  document.getElementById('yr').textContent='◉ '+p.yr;document.getElementById('ti').textContent=p.t;
+  document.getElementById('pu').textContent='“'+p.pull+'”';document.getElementById('bd').textContent=p.d;
+  document.getElementById('tg').innerHTML=p.tags.map(t=>`<span>${t}</span>`).join('');
+  document.getElementById('vi').href=p.url;panel.style.borderLeftColor=p.col;
+  panel.classList.add('open');document.getElementById('intro').classList.add('hide');}
+document.getElementById('close').onclick=()=>panel.classList.remove('open');
+addEventListener('keydown',e=>{if(e.key==='Escape')panel.classList.remove('open');});
+document.getElementById('dock').innerHTML=P.map((p,i)=>`<button data-i="${i}"><span class="d" style="background:${p.col}"></span>${p.t.split(' ')[0]}</button>`).join('');
+document.getElementById('dock').addEventListener('click',e=>{const b=e.target.closest('button');if(b)open(+b.dataset.i);});
+</script>
+</body>
+</html>

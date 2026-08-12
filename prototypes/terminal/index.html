@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal Directions — lissan.dev</title>
+<style>
+  :root{--bg:#0a0e0a;--card:#11160f;--fg:#e8f0d8;--mute:#8aa07a;--amber:#ffb454;--green:#8ec07c;--line:#223019;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--mono);line-height:1.6;
+    background-image:radial-gradient(ellipse at 50% -10%,rgba(255,180,84,.08),transparent 55%)}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(26px,6vw,64px) clamp(16px,4vw,30px)}
+  a.back{color:var(--mute);text-decoration:none;font-size:13px}a.back:hover{color:var(--fg)}
+  header{margin:22px 0 40px}
+  .k{color:var(--green);font-size:13px;letter-spacing:.1em}
+  h1{font-size:clamp(30px,6vw,52px);font-weight:700;letter-spacing:-.02em;margin:12px 0;line-height:1.02}
+  header p{color:var(--mute);max-width:64ch}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .opt{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.2s}
+  .opt:hover{transform:translateY(-4px);border-color:var(--amber);box-shadow:0 18px 44px -24px var(--amber)}
+  .thumb{height:130px;border-bottom:1px solid var(--line);padding:14px 16px;font-size:11px;overflow:hidden;position:relative}
+  .body{padding:16px 18px}
+  .n{color:var(--mute);font-size:12px}
+  .opt h2{font-size:20px;margin:4px 0 6px}
+  .opt p{color:var(--mute);font-size:13.5px}
+  .go{position:absolute;top:14px;right:16px;color:var(--amber);opacity:0;transition:.2s}
+  .opt:hover .go{opacity:1}
+  /* mini previews */
+  .t1{background:#0000a8;color:#54fcfc}.t1 b{color:#fcfc54}
+  .t2{background:#000;color:#00ff66}
+  .t3{background:#181a23;color:#7aa2f7;display:flex;gap:8px}.t3 .sb{color:#6b7089;border-right:1px solid #262a3b;padding-right:8px}
+  .t4{background:#272822;color:#a6e22e}.t4 .p{color:#f92672}.t4 .s{color:#e6db74}.t4 .c{color:#75715e}
+  .t5{background:#0000aa;color:#55ffff}.t5 b{color:#fff}
+  footer{margin-top:44px;color:var(--mute);font-size:12.5px;text-align:center}
+  footer a{color:var(--amber);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← all directions</a>
+  <header>
+    <div class="k">$ ls ~/terminal-directions</div>
+    <h1>Five terminals,<br>five metaphors.</h1>
+    <p>Same real content, five completely different terminal-flavoured takes — a BIOS, the Matrix, a chat client, a code editor and a file manager. All interactive, all self-contained.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>part of the <a href="../index.html">lissan.dev prototype set</a> · the original amber shell lives at <a href="../01-terminal.html">../01-terminal.html</a></footer>
+</div>
+<script>
+const OPTS=[
+ {f:'01-bios.html',n:'TERMINAL 01',title:'The BIOS',desc:'A retro AMI-BIOS boot: memory count-up, device detection, then a Setup menu you arrow through to reveal projects as “hardware”.',
+  thumb:`<div class="t1"><b>LISSAN BIOS SETUP</b><br>Memory Test : 65536K OK<br>Detecting drives...<br>&gt; AGENTS-SSD [OK]<br>&gt; QUANTUM-DISK [OK]<br><b>▸ WorldEval [2026]</b></div>`},
+ {f:'02-matrix.html',n:'TERMINAL 02',title:'The Matrix',desc:'Green digital rain, a login prompt, “access granted”, then nine projects decode out of the falling glyphs.',
+  thumb:`<div class="t2">わ ﾊ 0 1 ｷ わ ﾊ<br>&gt; establishing uplink [OK]<br>lissan login: _<br>ﾊ 1 0 ｷ わ ﾊ 0 ｷ<br>&gt; decrypting 9 records...</div>`},
+ {f:'03-irc.html',n:'TERMINAL 03',title:'The Chat',desc:'A terminal messenger. Channels for each topic, and lissan-bot answers /commands or plain questions with project cards.',
+  thumb:`<div class="t3"><div class="sb">#start<br>#agents<br>#quantum<br>#quant<br>#vision</div><div>lissan-bot: hey — I'm<br>lissan-bot 👋<br>you › /projects</div></div>`},
+ {f:'04-editor.html',n:'TERMINAL 04',title:'The Editor',desc:'A vim-style editor with portfolio.py open — syntax highlighting, a status line, foldable project “functions” and : commands.',
+  thumb:`<div class="t4"><span class="c"># lissan.dev</span><br><span class="p">def</span> <span style="color:#a6e22e">world_eval</span>():<br>&nbsp;&nbsp;<span class="s">"""WorldEval"""</span><br>&nbsp;&nbsp;<span class="p">return</span> open(...)<br>-- NORMAL --</div>`},
+ {f:'05-filemanager.html',n:'TERMINAL 05',title:'The Commander',desc:'A dual-pane blue file manager à la Midnight Commander. Browse /projects and /about, F-key footer, Enter to open.',
+  thumb:`<div class="t5"><b>~/projects</b> │ ~/about<br>/WorldEval &nbsp;2026<br>/QuantumJunction 2026<br>/AdvisoryWorkbench<br><b>F3</b>View <b>F4</b>Open <b>F10</b>Quit</div>`}
+];
+document.getElementById('grid').innerHTML=OPTS.map(o=>`
+  <a class="opt" href="${o.f}">
+    <span class="go">↗</span>
+    <div class="thumb">${o.thumb}</div>
+    <div class="body"><div class="n">${o.n}</div><h2>${o.title}</h2><p>${o.desc}</p></div>
+  </a>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbital Directions — lissan.dev</title>
+<style>
+  :root{--bg:#04060f;--card:#0b1020;--fg:#e7ecff;--mute:#8b93b8;--accent:#8fb4ff;--line:#1b2340;
+    --font:"Space Grotesk","Segoe UI",system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.6;
+    background-image:radial-gradient(ellipse at 50% -10%,rgba(143,180,255,.12),transparent 55%)}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(26px,6vw,64px) clamp(16px,4vw,30px)}
+  a.back{color:var(--mute);text-decoration:none;font-size:13px;font-family:var(--mono)}a.back:hover{color:var(--fg)}
+  header{margin:22px 0 40px}
+  .k{color:var(--accent);font-size:13px;letter-spacing:.14em;font-family:var(--mono)}
+  h1{font-size:clamp(30px,6vw,54px);font-weight:700;letter-spacing:-.02em;margin:12px 0;line-height:1.02}
+  header p{color:var(--mute);max-width:64ch}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .opt{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:.2s}
+  .opt:hover{transform:translateY(-5px);border-color:var(--edge);box-shadow:0 20px 50px -24px var(--edge)}
+  .thumb{height:150px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .thumb canvas{width:100%;height:100%;display:block}
+  .body{padding:16px 20px 20px}
+  .n{color:var(--mute);font-size:12px;font-family:var(--mono)}
+  .opt h2{font-size:21px;margin:5px 0 6px}
+  .opt p{color:var(--mute);font-size:13.5px}
+  .go{position:absolute;top:14px;right:16px;color:#fff;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);
+    width:32px;height:32px;border-radius:50%;display:grid;place-items:center;opacity:0;transition:.2s;z-index:2}
+  .opt:hover .go{opacity:1}
+  footer{margin-top:44px;color:var(--mute);font-size:12.5px;text-align:center;font-family:var(--mono)}
+  footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← all directions</a>
+  <header>
+    <div class="k">// FIVE WAYS TO PUT WORK IN MOTION</div>
+    <h1>Five orbital<br>worlds.</h1>
+    <p>Every project set in motion, five totally different ways — a spiral galaxy, a constellation chart, an atom, a live gravity sandbox and a clockwork orrery. Each is interactive and self-contained.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>part of the <a href="../index.html">lissan.dev prototype set</a> · the original solar-system version lives at <a href="../05-orbital.html">../05-orbital.html</a></footer>
+</div>
+<script>
+const OPTS=[
+ {f:'01-galaxy.html',n:'ORBITAL 01',title:'The Galaxy',edge:'#c9a6ff',desc:'A top-down spiral galaxy that slowly rotates. Scroll to zoom, drag to drift, click a bright star to open a project.',draw:'galaxy'},
+ {f:'02-constellation.html',n:'ORBITAL 02',title:'The Star Chart',edge:'#f2d59b',desc:'An antique celestial chart. Projects are named stars joined into constellations; hover to trace one, click to open.',draw:'const'},
+ {f:'03-atom.html',n:'ORBITAL 03',title:'The Atom',edge:'#38e8ff',desc:'A Bohr-model atom. Projects are electrons on inclined shells; drag to rotate the whole atom in 3D, click an electron.',draw:'atom'},
+ {f:'04-gravity.html',n:'ORBITAL 04',title:'The Gravity Sandbox',edge:'#4dff9e',desc:'Real N-body physics. Each project orbits a central mass — grab one and fling it into a new orbit, or click to open.',draw:'gravity'},
+ {f:'05-orrery.html',n:'ORBITAL 05',title:'The Orrery',edge:'#e8b96b',desc:'A clockwork orrery drawn as a blueprint — brass gears on radial arms turning against a technical grid.',draw:'orrery'}
+];
+document.getElementById('grid').innerHTML=OPTS.map(o=>`
+  <a class="opt" href="${o.f}" style="--edge:${o.edge}">
+    <span class="go">↗</span>
+    <div class="thumb"><canvas data-draw="${o.draw}" data-edge="${o.edge}"></canvas></div>
+    <div class="body"><div class="n">${o.n}</div><h2>${o.title}</h2><p>${o.desc}</p></div>
+  </a>`).join('');
+
+// lightweight animated mini-previews
+document.querySelectorAll('.thumb canvas').forEach(cv=>{
+  const ctx=cv.getContext('2d');const edge=cv.dataset.edge;const kind=cv.dataset.draw;
+  function size(){cv.width=cv.clientWidth*2;cv.height=cv.clientHeight*2;}
+  size();addEventListener('resize',size);
+  let t=0;const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function frame(){
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2;t+=0.02;
+    ctx.fillStyle='#080c18';ctx.fillRect(0,0,W,H);
+    if(kind==='galaxy'){for(let i=0;i<160;i++){const arm=i%2,r=Math.pow(i/160,.8);
+      const a=arm*Math.PI+r*8+t*0.4;const px=cx+Math.cos(a)*r*W*0.4,py=cy+Math.sin(a)*r*H*0.34;
+      ctx.globalAlpha=.5;ctx.fillStyle=i%9===0?edge:'#9db4d8';ctx.beginPath();ctx.arc(px,py,i%9===0?3:1.4,0,7);ctx.fill();}}
+    else if(kind==='const'){ctx.strokeStyle=edge;ctx.globalAlpha=.5;ctx.lineWidth=1.2;
+      const pts=[[.3,.4],[.5,.3],[.7,.45],[.6,.65],[.4,.6]].map(p=>[p[0]*W,p[1]*H]);
+      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();
+      ctx.globalAlpha=1;pts.forEach(p=>{ctx.fillStyle=edge;ctx.beginPath();ctx.arc(p[0],p[1],3,0,7);ctx.fill();});}
+    else if(kind==='atom'){[[.28,0],[.44,1.1],[.6,-.7]].forEach((sh,si)=>{ctx.strokeStyle=si===1?edge:'rgba(120,170,220,.4)';
+      ctx.globalAlpha=.7;ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(cx,cy,sh[0]*W,sh[0]*W*0.35,sh[1]+t*0.2,0,7);ctx.stroke();
+      const a=t*(2-si)+si;ctx.fillStyle=edge;ctx.beginPath();ctx.arc(cx+Math.cos(a)*sh[0]*W,cy+Math.sin(a)*sh[0]*W*0.35,4,0,7);ctx.fill();});
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,7,0,7);ctx.fill();}
+    else if(kind==='gravity'){ctx.fillStyle=edge;ctx.beginPath();ctx.arc(cx,cy,8,0,7);ctx.fill();
+      for(let i=0;i<5;i++){const R=(0.16+i*0.07)*W;const a=t*(1.6-i*0.2)+i;
+        ctx.strokeStyle='rgba(120,200,160,.25)';ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();
+        ctx.fillStyle=edge;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(cx+Math.cos(a)*R,cy+Math.sin(a)*R,3,0,7);ctx.fill();ctx.globalAlpha=1;}}
+    else if(kind==='orrery'){for(let i=1;i<=5;i++){const R=(0.1+i*0.075)*W;
+      ctx.setLineDash([2,5]);ctx.strokeStyle='rgba(120,180,240,.25)';ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();ctx.setLineDash([]);
+      const a=t*(1/(i*0.5))+i;const px=cx+Math.cos(a)*R,py=cy+Math.sin(a)*R;
+      ctx.strokeStyle='rgba(120,180,240,.3)';ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.stroke();
+      ctx.fillStyle=edge;ctx.beginPath();ctx.arc(px,py,3,0,7);ctx.fill();}
+      ctx.fillStyle=edge;ctx.beginPath();ctx.arc(cx,cy,5,0,7);ctx.fill();}
+    ctx.globalAlpha=1;
+    if(!reduce)requestAnimationFrame(frame);
+  }
+  frame();
+});
+</script>
+</body>
+</html>

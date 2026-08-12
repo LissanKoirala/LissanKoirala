@@ -76,8 +76,8 @@
 <div class="wrap">
   <header>
     <div class="kicker">lissan.dev · portfolio rebuild</div>
-    <h1>Six directions,<br>one you.</h1>
-    <p>Six fully-working, wildly different takes on a personal portfolio — same real content, radically different feel. Open each, live with it, then tell me which direction to take all the way.</p>
+    <h1>Directions,<br>one you.</h1>
+    <p>Fully-working, wildly different takes on a personal portfolio — same real content, radically different feel. The <b style="color:var(--fg)">terminal</b> and <b style="color:var(--fg)">orbital</b> concepts are each expanded into five variations of their own (the ★ cards). Open any, live with it, then tell me which to take all the way.</p>
     <div class="note">
       <b>Note:</b> every project shown is real and pulled from your GitHub — WorldEval, Quantum Junction, the SwissHacks Advisory Workbench, the CASSINI aurora build, and the rest. No biography, employer, or education claims were invented; a couple of framing lines (e.g. "based in the UK") are placeholders for you to confirm or cut.
     </div>
@@ -92,6 +92,14 @@
 
 <script>
 const OPTS=[
+  {file:"terminal/index.html",n:"★",edge:"#ffb454",title:"Terminal — 5 variations",count:"5 inside",
+   desc:"Pushed further: five totally different terminal metaphors — a BIOS, the Matrix, a chat client, a vim editor and a file manager.",
+   mood:["family","interactive","5 takes"],
+   thumb:`<div class="t-term"><span style="color:#8a7a52">$</span> ls terminal/<br><b>bios</b> matrix irc<br><b>editor</b> filemanager<br><span style="color:#7cd6e0">5 directions →</span></div>`},
+  {file:"orbital/index.html",n:"★",edge:"#69b7ff",title:"Orbital — 5 variations",count:"5 inside",
+   desc:"Pushed further: five ways to set the work in motion — a spiral galaxy, a constellation chart, an atom, a gravity sandbox and a clockwork orrery.",
+   mood:["family","canvas","5 takes"],
+   thumb:`<div class="t-orb"><div class="ring" style="width:70px;height:42px"></div><div class="ring" style="width:130px;height:78px"></div><div class="sun"></div><div class="p" style="width:9px;height:9px;background:#c9a6ff;left:calc(50% + 48px);top:calc(50% - 6px)"></div><div class="p" style="width:8px;height:8px;background:#38e8ff;left:calc(50% - 54px);top:calc(50% + 10px)"></div><div class="p" style="width:9px;height:9px;background:#4dff9e;left:calc(50% + 2px);top:calc(50% + 44px)"></div></div>`},
   {file:"01-terminal.html",n:"01",edge:"#ffb454",title:"The Terminal",
    desc:"An interactive shell. Type commands, boot sequence, amber phosphor CRT. For the hacker/builder identity.",
    mood:["interactive","monospace","playful"],
@@ -122,7 +130,7 @@ document.getElementById('grid').innerHTML=OPTS.map(o=>`
     <span class="go">↗</span>
     <div class="thumb">${o.thumb}</div>
     <div class="body">
-      <div class="n">DIRECTION ${o.n}</div>
+      <div class="n">${o.count?'FAMILY':'DIRECTION '+o.n}${o.count?' · '+o.count:''}</div>
       <h2>${o.title}</h2>
       <p>${o.desc}</p>
       <div class="mood">${o.mood.map(m=>`<span>${m}</span>`).join('')}</div>

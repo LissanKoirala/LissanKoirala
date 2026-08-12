@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lissan commander</title>
+<style>
+  :root{
+    --blue:#0000aa; --blue-l:#1414c8; --cyan:#00aaaa; --ltcyan:#55ffff; --white:#ffffff;
+    --gray:#aaaaaa; --yellow:#ffff55; --green:#55ff55; --black:#000000; --sel:#00aaaa;
+    --mono:"IBM Plex Mono",ui-monospace,"Courier New",Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:#000;color:var(--gray);font-family:var(--mono);font-size:14px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;line-height:1.5}
+  .mc{width:100%;height:100%;max-width:1120px;max-height:780px;background:var(--blue);
+    display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .mc::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 2px,transparent 2px 4px)}
+  .topmenu{background:var(--cyan);color:var(--black);display:flex;gap:0;flex:none}
+  .topmenu span{padding:2px 16px} .topmenu span b{color:var(--yellow)}
+  .panes{flex:1;display:flex;gap:2px;padding:2px;min-height:0}
+  .pane{flex:1;border:1px solid var(--ltcyan);display:flex;flex-direction:column;min-height:0;background:var(--blue)}
+  .pane.active{border-color:var(--white)}
+  .pane .ph{background:var(--ltcyan);color:var(--blue);text-align:center;font-weight:bold;flex:none}
+  .pane .cols{display:flex;color:var(--yellow);border-bottom:1px solid var(--cyan);flex:none;padding:0 2px}
+  .pane .cols .n{flex:1;padding-left:4px} .pane .cols .s{width:70px;text-align:right;padding-right:6px}
+  .list{flex:1;overflow-y:auto;padding:1px 2px;scrollbar-width:thin;scrollbar-color:var(--cyan) transparent}
+  .list::-webkit-scrollbar{width:8px}.list::-webkit-scrollbar-thumb{background:var(--cyan)}
+  .row{display:flex;cursor:pointer;padding:0 2px}
+  .row .n{flex:1;padding-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .s{width:70px;text-align:right;padding-right:6px}
+  .row.dir .n{color:var(--white);font-weight:bold}
+  .row.up .n{color:var(--white)}
+  .row.file .n{color:var(--ltcyan)}
+  .row.sel{background:var(--cyan);color:var(--black)}
+  .row.sel .n,.row.sel.dir .n,.row.sel.file .n{color:var(--black)}
+  .info{border:1px solid var(--ltcyan);margin:2px;flex:none;max-height:42%;overflow:auto;background:var(--blue);
+    padding:8px 12px;display:none}
+  .info.show{display:block}
+  .info h3{color:var(--yellow)} .info .pull{color:var(--ltcyan);margin:2px 0 8px}
+  .info .k{color:var(--gray)} .info .v{color:var(--white)}
+  .info .desc{color:var(--white);margin:6px 0}
+  .info .tags{color:var(--green)} .info a{color:var(--yellow)}
+  .hint{color:var(--gray);text-align:center;flex:none;padding:2px}
+  .fkeys{background:var(--black);display:flex;flex:none}
+  .fkeys .fk{flex:1;display:flex;gap:0;color:var(--white);font-size:13px}
+  .fkeys .fk b{color:var(--gray);padding:1px 2px 1px 6px} .fkeys .fk .lbl{background:var(--cyan);color:var(--black);padding:1px 6px 1px 4px;flex:1}
+  @media(max-width:720px){body{font-size:12px}.panes{flex-direction:column}.fkeys{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="mc" id="mc">
+  <div class="topmenu"><span><b>L</b>eft</span><span><b>F</b>ile</span><span><b>C</b>ommand</span><span><b>O</b>ptions</span><span><b>R</b>ight</span><span style="margin-left:auto;color:var(--black)">lissan commander 4.8</span></div>
+  <div class="panes">
+    <div class="pane active" id="paneL">
+      <div class="ph" id="phL">~/projects</div>
+      <div class="cols"><span class="n">Name</span><span class="s">Year</span></div>
+      <div class="list" id="listL"></div>
+    </div>
+    <div class="pane" id="paneR">
+      <div class="ph">~/about</div>
+      <div class="cols"><span class="n">Name</span><span class="s">Size</span></div>
+      <div class="list" id="listR"></div>
+    </div>
+  </div>
+  <div class="info" id="info"></div>
+  <div class="hint" id="hint">↑↓ move · Enter open dir / launch · Tab switch pane · F3 view · F4 open link</div>
+  <div class="fkeys" id="fkeys"></div>
+</div>
+
+<script>
+const P=[
+ {key:'worldeval',n:'WorldEval',yr:2026,cat:'agents',pull:'Evaluate what a model does, not only what it says.',desc:'LLM agents in deterministic 3D worlds — sealed plans, real consequences, an authoritative Godot sim.',tags:['Python','Godot 4.5','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval'},
+ {key:'quantum',n:'QuantumJunction',yr:2026,cat:'quantum',pull:'Choose the right simulator before spending the compute.',desc:'Reads each obfuscated peaked quantum circuit, routes it to the cheapest attack. 41/49 solved.',tags:['Qiskit','TensorNets','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction'},
+ {key:'advisory',n:'AdvisoryWorkbench',yr:2026,cat:'quant',pull:'The agent proposes, the human decides — every claim cited.',desc:'SwissHacks 2026 for SIX: provenance-first wealth advisory. Nothing auto-executes.',tags:['Next.js','FastAPI'],url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {key:'aurora',n:'AuroraVisibility',yr:2025,cat:'geo',pull:'Where can you really see the aurora tonight?',desc:'CASSINI Hackathon: OVATION oval fused with Sentinel cloud & light-pollution data.',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {key:'algo',n:'algo',yr:2026,cat:'quant',pull:'Signals in, positions out.',desc:'A live algorithmic trading system with a positions dashboard.',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard'},
+ {key:'tube',n:'UndergroundMap',yr:2025,cat:'agents',pull:'Watch London move.',desc:'A live map of the Tube and London buses in real time.',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map'},
+ {key:'godseye',n:'GodsEye',yr:2024,cat:'vision',pull:'Every camera, one eye.',desc:'Multi-camera surveillance & person tracking, inspired by Fast & Furious.',tags:['OpenCV'],url:'https://godseye.lissan.dev'},
+ {key:'solar',n:'SolarSystemSim',yr:2023,cat:'vision',pull:"Newton's laws, one time-step at a time.",desc:'N-body simulation studying Comet Halley\'s orbit, with papers.',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {key:'robot',n:'RobotVision',yr:2022,cat:'vision',pull:'Sight, then motion.',desc:'A 3D-printed robot controlled programmatically through a CV pipeline.',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+const ABOUT=[
+ {n:'whoami.txt',size:'1k',body:'Lissan Koirala — engineer. I build systems that act on the real world: AI agents, quantum solvers, trading systems, computer vision. If it\'s a hard problem and nobody\'s sure it\'ll work, that\'s the one I want.'},
+ {n:'skills.json',size:'2k',body:'Python · JavaScript · Java · MATLAB · Qiskit · tensor networks · Godot 4 · FastAPI · Next.js · Django · Flask · OpenCV · MediaPipe · TensorFlow · Docker · Linux · Git · SQLite.'},
+ {n:'focus.md',size:'1k',body:'AI agents & evaluation · quantum computing · algorithmic / quantitative trading · computer vision & physics simulation. 4 hackathons shipped, 50+ public repos.'},
+ {n:'contact.vcf',size:'1k',body:'GitHub: github.com/LissanKoirala\nEmail: lissanartist@gmail.com\nWeb: lissan.dev',url:'mailto:lissanartist@gmail.com'},
+ {n:'github.url',size:'1k',body:'→ github.com/LissanKoirala',url:'https://github.com/LissanKoirala'}
+];
+
+const FKEYS=[['1','Help'],['3','View'],['4','Open'],['5','Copy'],['6','GitHub'],['8','Email'],['9','Menu'],['10','Quit']];
+document.getElementById('fkeys').innerHTML=FKEYS.map(([n,l])=>`<span class="fk"><b>${n}</b><span class="lbl">${l}</span></span>`).join('');
+
+let activePane='L', selL=0, selR=0;
+function rowsL(){return [{up:true,n:'..',yr:''},...P.map(p=>({...p,dir:true}))];}
+function rowsR(){return [{up:true,n:'..',size:''},...ABOUT.map(a=>({...a,file:true}))];}
+
+function render(){
+  const L=rowsL(),R=rowsR();
+  document.getElementById('listL').innerHTML=L.map((r,i)=>rowHtml(r,i,selL,'L')).join('');
+  document.getElementById('listR').innerHTML=R.map((r,i)=>rowHtml(r,i,selR,'R')).join('');
+  document.getElementById('paneL').classList.toggle('active',activePane==='L');
+  document.getElementById('paneR').classList.toggle('active',activePane==='R');
+  document.querySelectorAll('#listL .row').forEach(el=>{el.onclick=()=>{activePane='L';selL=+el.dataset.i;render();showInfo();};el.ondblclick=()=>openSel();});
+  document.querySelectorAll('#listR .row').forEach(el=>{el.onclick=()=>{activePane='R';selR=+el.dataset.i;render();showInfo();};el.ondblclick=()=>openSel();});
+  showInfo();
+}
+function rowHtml(r,i,sel,pane){
+  const cls=['row']; if(r.up)cls.push('up'); else if(r.dir)cls.push('dir'); else cls.push('file');
+  if(i===sel&&((pane==='L'&&activePane==='L')||(pane==='R'&&activePane==='R')))cls.push('sel');
+  const nm=(r.dir?'/':r.up?'':' ')+r.n;
+  const meta=pane==='L'?(r.yr||''):(r.size||'');
+  return `<div class="${cls.join(' ')}" data-i="${i}"><span class="n">${nm}</span><span class="s">${meta}</span></div>`;
+}
+function cur(){return activePane==='L'?{list:rowsL(),i:selL}:{list:rowsR(),i:selR};}
+function showInfo(){
+  const {list,i}=cur();const r=list[i];const info=document.getElementById('info');
+  if(!r||r.up){info.classList.remove('show');return;}
+  info.classList.add('show');
+  if(activePane==='L'){
+    info.innerHTML=`<h3>/${r.n}  <span style="color:var(--gray)">[${r.yr}]</span></h3>
+      <div class="pull">"${r.pull}"</div>
+      <div><span class="k">category :</span> <span class="v">${r.cat}</span></div>
+      <div class="desc">${r.desc}</div>
+      <div class="tags">stack: ${r.tags.join(' · ')}</div>
+      <div style="margin-top:6px"><a href="${r.url}" target="_blank" rel="noreferrer">↵ Enter / F4 → open ${r.url}</a></div>`;
+  } else {
+    info.innerHTML=`<h3>${r.n}</h3><div class="desc" style="white-space:pre-wrap">${r.body}</div>`+
+      (r.url?`<div style="margin-top:6px"><a href="${r.url}" target="_blank" rel="noreferrer">↵ open ${r.url}</a></div>`:'');
+  }
+}
+function openSel(){
+  const {list,i}=cur();const r=list[i];if(!r)return;
+  if(r.up){flash('already at top');return;}
+  if(r.url){window.open(r.url,'_blank');flash('opening '+r.url);}
+  else flash('viewing '+r.n+' (see panel above)');
+}
+function move(d){
+  if(activePane==='L'){const n=rowsL().length;selL=(selL+d+n)%n;}
+  else{const n=rowsR().length;selR=(selR+d+n)%n;}
+  render();
+}
+function flash(m){document.getElementById('hint').textContent=m;
+  setTimeout(()=>{document.getElementById('hint').textContent='↑↓ move · Enter open · Tab switch pane · F3 view · F4 open link';},2200);}
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){move(1);e.preventDefault();}
+  else if(e.key==='ArrowUp'){move(-1);e.preventDefault();}
+  else if(e.key==='Tab'){activePane=activePane==='L'?'R':'L';render();e.preventDefault();}
+  else if(e.key==='Enter'){openSel();}
+  else if(e.key==='F4'){openSel();e.preventDefault();}
+  else if(e.key==='F6'||e.key==='6'){window.open('https://github.com/LissanKoirala','_blank');}
+  else if(e.key==='F8'||e.key==='8'){window.open('mailto:lissanartist@gmail.com','_blank');}
+  else if(e.key==='F1'||e.key==='1'){flash('lissan commander — browse /projects (left) & /about (right). Enter opens.');}
+  else if(e.key==='F10'){flash('there is no quit. try opening a project instead :)');}
+});
+render();
+</script>
+</body>
+</html>

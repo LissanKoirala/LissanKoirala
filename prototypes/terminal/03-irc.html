@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lissan-irc</title>
+<style>
+  :root{
+    --bg:#12131a; --panel:#181a23; --panel2:#1e2130; --fg:#c8ccd8; --mute:#6b7089;
+    --accent:#7aa2f7; --green:#9ece6a; --pink:#f7768e; --yellow:#e0af68; --cyan:#7dcfff; --purple:#bb9af7;
+    --line:#262a3b;
+    --mono:"IBM Plex Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:14px;overflow:hidden}
+  .app{height:100%;display:grid;grid-template-columns:220px 1fr;grid-template-rows:1fr auto;
+    grid-template-areas:"side main" "side input"}
+  /* sidebar */
+  .side{grid-area:side;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+  .side .top{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .side .top b{color:var(--fg)} .side .top span{color:var(--green);font-size:12px}
+  .chanhead{color:var(--mute);font-size:11px;letter-spacing:.1em;padding:12px 16px 4px;text-transform:uppercase}
+  .chan{padding:6px 16px;cursor:pointer;color:var(--mute);display:flex;justify-content:space-between}
+  .chan:hover{background:var(--panel2);color:var(--fg)}
+  .chan.on{background:var(--panel2);color:var(--accent);border-left:2px solid var(--accent)}
+  .chan .h{color:var(--mute)}
+  .side .foot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--line);color:var(--mute);font-size:12px}
+  .side .foot a{color:var(--cyan);text-decoration:none}
+  /* main */
+  .main{grid-area:main;display:flex;flex-direction:column;overflow:hidden}
+  .topic{padding:11px 18px;border-bottom:1px solid var(--line);background:var(--panel);color:var(--fg)}
+  .topic .c{color:var(--accent)} .topic .t{color:var(--mute)}
+  .log{flex:1;overflow-y:auto;padding:14px 18px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+  .log::-webkit-scrollbar{width:8px}.log::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .msg{margin:3px 0;line-height:1.5;word-wrap:break-word}
+  .msg .ts{color:var(--mute);font-size:12px;margin-right:8px}
+  .msg .nick{font-weight:bold;margin-right:8px}
+  .n-bot{color:var(--green)} .n-you{color:var(--accent)} .n-sys{color:var(--mute)}
+  .msg.sys{color:var(--mute);font-style:italic}
+  .msg .body a{color:var(--cyan);text-decoration:none;border-bottom:1px solid var(--line)}
+  .msg .body a:hover{border-color:var(--cyan)}
+  .card{border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:6px;
+    padding:10px 14px;margin:8px 0 8px 0;background:var(--panel)}
+  .card .t{color:var(--fg);font-weight:bold} .card .yr{color:var(--mute)}
+  .card .pull{color:var(--yellow);font-size:13px;margin:2px 0}
+  .card .desc{color:var(--fg);opacity:.9;font-size:13.5px}
+  .card .tags{color:var(--mute);font-size:12px;margin-top:6px}
+  .card a{color:var(--cyan);text-decoration:none}
+  /* input */
+  .inputbar{grid-area:input;border-top:1px solid var(--line);background:var(--panel);
+    display:flex;align-items:center;gap:10px;padding:12px 18px}
+  .inputbar .you{color:var(--accent)}
+  #inp{flex:1;background:transparent;border:none;color:var(--fg);font:inherit;outline:none;caret-color:var(--accent)}
+  .quick{display:flex;gap:6px;flex-wrap:wrap;padding:0 18px 10px;background:var(--panel)}
+  .quick button{background:var(--panel2);border:1px solid var(--line);color:var(--mute);font:inherit;
+    font-size:12px;padding:4px 10px;border-radius:6px;cursor:pointer}
+  .quick button:hover{color:var(--fg);border-color:var(--accent)}
+  @media(max-width:640px){.app{grid-template-columns:1fr;grid-template-areas:"main" "input"}.side{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="top"><b>lissan-irc</b><br><span>● online</span> <span style="color:var(--mute)">as @guest</span></div>
+    <div class="chanhead">Channels</div>
+    <div id="chans"></div>
+    <div class="foot">
+      /help for commands<br>
+      <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">github ↗</a> ·
+      <a href="mailto:lissanartist@gmail.com">email</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topic" id="topic"></div>
+    <div class="log" id="log"></div>
+  </main>
+  <div class="quick" id="quick"></div>
+  <div class="inputbar">
+    <span class="you">[#<span id="curchan">start</span>] you ›</span>
+    <input id="inp" autocomplete="off" spellcheck="false" placeholder="type a message or /command…" aria-label="message">
+  </div>
+</div>
+
+<script>
+const P=[
+ {key:'worldeval',t:'WorldEval / WorldArena',yr:'2026',cat:'agents',pull:'Evaluate what a model does, not only what it says.',desc:'An evaluation framework for LLM agents in deterministic 3D worlds — three models get partial views, submit sealed plans, and live with the consequences inside an authoritative Godot sim.',tags:['Python','Godot 4.5','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval'},
+ {key:'quantum',t:'Quantum Junction',yr:'2026',cat:'quantum',pull:'Choose the right simulator before spending the compute.',desc:'A compute-aware pipeline that reads each obfuscated peaked quantum circuit and routes it to the cheapest attack — statevector, MPS, tensor-network or MPO unswapping. 41/49 solved.',tags:['Qiskit','Tensor networks','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction'},
+ {key:'advisory',t:'Advisory Workbench',yr:'2026',cat:'quant',pull:'The agent proposes, the human decides — every claim cited.',desc:'A provenance-first wealth-advisory workbench built at SwissHacks 2026 for SIX. Watches news against a living client profile and proposes CIO-approved swaps. Nothing auto-executes.',tags:['Next.js','FastAPI','Fintech'],url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {key:'aurora',t:'Aurora Visibility',yr:'2025',cat:'agents',pull:'Where can you really see the northern lights tonight?',desc:'A CASSINI Hackathon pipeline that scores real aurora visibility — fusing the OVATION oval model with Sentinel cloud thickness and light-pollution layers.',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {key:'algo',t:'Algo',yr:'2026',cat:'quant',pull:'Signals in, positions out.',desc:'A live algorithmic trading system with a positions dashboard, in active development.',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard'},
+ {key:'tube',t:'Underground Live Map',yr:'2025',cat:'agents',pull:'Watch London move.',desc:'A live map animating the London Underground and bus network in real time.',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map'},
+ {key:'godseye',t:"God's Eye",yr:'2024',cat:'vision',pull:'Every camera, one eye.',desc:'A multi-camera surveillance and person-tracking system, inspired by Fast & Furious.',tags:['OpenCV'],url:'https://godseye.lissan.dev'},
+ {key:'solar',t:'Solar System Simulation',yr:'2023',cat:'vision',pull:"Newton's laws, one time-step at a time.",desc:'An N-body simulation used to study how Comet Halley orbits, with Kepler and Halley papers.',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {key:'robot',t:'Robot Vision',yr:'2022',cat:'vision',pull:'Sight, then motion.',desc:'A 3D-printed robot controlled programmatically through a computer-vision pipeline.',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+const CHANS=[
+ {c:'start',topic:'welcome — say hi, or /help',cat:null},
+ {c:'agents',topic:'AI agents & evaluation',cat:'agents'},
+ {c:'quantum',topic:'quantum computing',cat:'quantum'},
+ {c:'quant',topic:'algorithmic trading',cat:'quant'},
+ {c:'vision',topic:'computer vision & physics',cat:'vision'},
+ {c:'contact',topic:'how to reach Lissan',cat:'contact'},
+];
+const log=document.getElementById('log'), inp=document.getElementById('inp');
+let cur='start';
+document.getElementById('chans').innerHTML=CHANS.map(ch=>{
+  const n=ch.cat?P.filter(p=>p.cat===ch.cat).length:'';
+  return `<div class="chan ${ch.c==='start'?'on':''}" data-c="${ch.c}"><span>#${ch.c}</span><span class="h">${n}</span></div>`;
+}).join('');
+document.querySelectorAll('.chan').forEach(el=>el.onclick=()=>joinChan(el.dataset.c));
+
+function ts(){return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+function add(nick,cls,body){
+  const d=document.createElement('div');d.className='msg'+(cls==='sys'?' sys':'');
+  d.innerHTML= cls==='sys'? `<span class="body">— ${body}</span>`
+    : `<span class="ts">${ts()}</span><span class="nick n-${cls}">${nick}</span><span class="body">${body}</span>`;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+function card(p){
+  return `<div class="card"><div><span class="t">${p.t}</span> <span class="yr">[${p.yr}]</span></div>
+    <div class="pull">“${p.pull}”</div><div class="desc">${p.desc}</div>
+    <div class="tags">${p.tags.join(' · ')} — <a href="${p.url}" target="_blank" rel="noreferrer">open ↗</a></div></div>`;
+}
+function botCard(p){const d=document.createElement('div');d.className='msg';
+  d.innerHTML=`<span class="ts">${ts()}</span><span class="nick n-bot">lissan-bot</span><span class="body">${card(p)}</span>`;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;}
+
+function setTopic(){const ch=CHANS.find(c=>c.c===cur);
+  document.getElementById('topic').innerHTML=`<span class="c">#${ch.c}</span> <span class="t">— ${ch.topic}</span>`;
+  document.getElementById('curchan').textContent=cur;}
+function joinChan(c){
+  cur=c;document.querySelectorAll('.chan').forEach(el=>el.classList.toggle('on',el.dataset.c===c));
+  log.innerHTML='';setTopic();
+  const ch=CHANS.find(x=>x.c===c);
+  add('','sys',`you joined <b>#${c}</b>`);
+  if(c==='start'){ greet(); }
+  else if(c==='contact'){ contact(); }
+  else { const list=P.filter(p=>p.cat===ch.cat);
+    add('lissan-bot','bot',`here's what's in <b>#${c}</b> (${list.length}):`);
+    list.forEach((p,i)=>setTimeout(()=>botCard(p), 120*i)); }
+  refreshQuick();
+}
+function greet(){
+  add('lissan-bot','bot',`hey — I'm <b>lissan-bot</b> 👋 ask me anything about Lissan's work.`);
+  add('lissan-bot','bot',`try <b>/projects</b>, join a channel like <b>#quantum</b>, or type a keyword (agents, trading, aurora, robot).`);
+}
+function contact(){
+  add('lissan-bot','bot',`GitHub → <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">github.com/LissanKoirala</a>`);
+  add('lissan-bot','bot',`Email → <a href="mailto:lissanartist@gmail.com">lissanartist@gmail.com</a>`);
+  add('lissan-bot','bot',`Web → <a href="https://lissan.dev">lissan.dev</a>`);
+}
+function refreshQuick(){
+  const qs = cur==='start'? ['/projects','/help','#quantum','#quant','#agents','#contact']
+    : ['#start','/projects','/help'];
+  document.getElementById('quick').innerHTML=qs.map(q=>`<button data-q="${q}">${q}</button>`).join('');
+  document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{handle(b.dataset.q);});
+}
+function handle(raw){
+  const text=raw.trim(); if(!text)return;
+  if(text.startsWith('#')){ const c=text.slice(1); if(CHANS.find(x=>x.c===c)){joinChan(c);return;} }
+  add('you','you',escapeHtml(text));
+  if(text.startsWith('/')){ command(text.slice(1).split(/\s+/)); return; }
+  // keyword search
+  const q=text.toLowerCase();
+  const hits=P.filter(p=>(p.t+' '+p.cat+' '+p.tags.join(' ')+' '+p.desc).toLowerCase().includes(q));
+  setTimeout(()=>{
+    if(/\b(hi|hey|hello|yo)\b/.test(q)){add('lissan-bot','bot','hey! 👋 want the highlights? try <b>/projects</b> or join <b>#quantum</b>.');return;}
+    if(hits.length){add('lissan-bot','bot',`found ${hits.length} match${hits.length>1?'es':''}:`);hits.slice(0,4).forEach((p,i)=>setTimeout(()=>botCard(p),120*i));}
+    else add('lissan-bot','bot',`hmm, nothing for “${escapeHtml(text)}”. try /projects, or #quantum / #quant / #agents / #vision.`);
+  },260);
+}
+function command(a){
+  const c=a[0];
+  if(c==='help'){add('lissan-bot','bot','commands: <b>/projects</b>, <b>/about</b>, <b>/skills</b>, <b>/contact</b>, <b>/open &lt;name&gt;</b>, <b>/join #chan</b>. or just chat.');}
+  else if(c==='projects'){add('lissan-bot','bot',`all ${P.length} projects:`);P.forEach((p,i)=>setTimeout(()=>botCard(p),100*i));}
+  else if(c==='about'){add('lissan-bot','bot','Lissan Koirala — engineer across AI agents, quantum computing, quant trading and computer vision. Builds things that actually run.');}
+  else if(c==='skills'){add('lissan-bot','bot','Python · JavaScript · Qiskit · Godot · FastAPI · Next.js · OpenCV · TensorFlow · tensor networks · Docker · Linux.');}
+  else if(c==='contact'){contact();}
+  else if(c==='join'){const ch=(a[1]||'').replace('#','');if(CHANS.find(x=>x.c===ch))joinChan(ch);else add('lissan-bot','bot','no such channel.');}
+  else if(c==='open'){const q=a.slice(1).join(' ').toLowerCase();const p=P.find(x=>x.key===q||x.t.toLowerCase().includes(q));if(p){add('lissan-bot','bot','opening:');botCard(p);window.open(p.url,'_blank');}else add('lissan-bot','bot','which one? try /projects.');}
+  else add('lissan-bot','bot',`unknown command: /${c}. try /help.`);
+}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'){handle(inp.value);inp.value='';}});
+joinChan('start');
+</script>
+</body>
+</html>
