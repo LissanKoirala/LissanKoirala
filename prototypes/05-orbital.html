@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Orbit</title>
+<style>
+  :root{
+    --bg:#03040a; --fg:#dfe6ff; --mute:#7681ab; --star:#aab6e8;
+    --accent:#69b7ff; --font:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{background:radial-gradient(ellipse at 50% 40%,#0a1030 0%,#03040a 70%);
+    color:var(--fg);font-family:var(--font)}
+  canvas{position:fixed;inset:0;display:block;cursor:grab}
+  canvas.drag{cursor:grabbing}
+  /* top bar */
+  .top{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;
+    align-items:center;padding:20px clamp(16px,4vw,34px);pointer-events:none}
+  .brand{font-weight:700;letter-spacing:.02em;pointer-events:auto;font-size:18px}
+  .brand small{color:var(--mute);font-weight:400}
+  .top .r{display:flex;gap:20px;pointer-events:auto;font-size:14px}
+  .top .r a{color:var(--mute);text-decoration:none}
+  .top .r a:hover{color:var(--fg)}
+  /* intro card */
+  .intro{position:fixed;left:clamp(16px,4vw,44px);top:50%;transform:translateY(-50%);
+    max-width:340px;z-index:8;transition:opacity .5s,transform .5s}
+  .intro.hide{opacity:0;transform:translateY(-50%) translateX(-30px);pointer-events:none}
+  .intro .tag{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em}
+  .intro h1{font-size:clamp(34px,5vw,54px);line-height:1.02;font-weight:700;margin:14px 0;letter-spacing:-.02em}
+  .intro p{color:var(--mute);font-size:15.5px;line-height:1.6}
+  .intro .hintline{margin-top:22px;font-family:var(--mono);font-size:12.5px;color:var(--star);
+    display:flex;align-items:center;gap:8px}
+  .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);
+    animation:pl 1.8s infinite}
+  @keyframes pl{50%{opacity:.3}}
+
+  /* detail panel */
+  .panel{position:fixed;top:0;right:0;height:100%;width:min(440px,92vw);z-index:12;
+    background:linear-gradient(200deg,rgba(16,22,54,.96),rgba(6,9,22,.98));
+    backdrop-filter:blur(16px);border-left:1px solid rgba(105,183,255,.22);
+    transform:translateX(100%);transition:transform .42s cubic-bezier(.5,.1,.2,1);
+    padding:76px clamp(24px,4vw,40px) 40px;overflow-y:auto}
+  .panel.open{transform:translateX(0)}
+  .panel .close{position:absolute;top:22px;right:24px;background:none;border:1px solid var(--mute);
+    color:var(--fg);width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1}
+  .panel .close:hover{border-color:var(--fg)}
+  .panel .pyear{font-family:var(--mono);font-size:13px;color:var(--accent)}
+  .panel h2{font-size:30px;font-weight:700;margin:8px 0 6px;letter-spacing:-.02em}
+  .panel .pull{font-style:italic;color:var(--star);margin-bottom:18px}
+  .panel p.body{color:#c3cbf0;font-size:15.5px;line-height:1.65}
+  .panel .tags{display:flex;flex-wrap:wrap;gap:7px;margin:22px 0}
+  .panel .tags span{font-family:var(--mono);font-size:11.5px;color:var(--fg);
+    border:1px solid rgba(105,183,255,.3);border-radius:6px;padding:4px 9px}
+  .panel a.visit{display:inline-flex;gap:8px;align-items:center;margin-top:8px;
+    background:linear-gradient(100deg,#3d7bff,#69b7ff);color:#04122b;font-weight:700;
+    text-decoration:none;padding:13px 22px;border-radius:11px;font-size:14.5px}
+  .panel a.visit:hover{filter:brightness(1.08)}
+  .panel .meta{margin-top:30px;border-top:1px solid rgba(255,255,255,.08);padding-top:18px;
+    font-family:var(--mono);font-size:12px;color:var(--mute);line-height:1.9}
+
+  /* legend / list toggle */
+  .dock{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9;
+    display:flex;gap:8px;background:rgba(12,17,40,.7);border:1px solid rgba(105,183,255,.2);
+    backdrop-filter:blur(10px);border-radius:14px;padding:8px;max-width:94vw;overflow-x:auto;
+    scrollbar-width:none}
+  .dock::-webkit-scrollbar{display:none}
+  .dock button{background:none;border:none;color:var(--mute);font-family:var(--font);font-size:12.5px;
+    padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}
+  .dock button:hover{color:var(--fg);background:rgba(255,255,255,.05)}
+  .dock button .d{width:9px;height:9px;border-radius:50%}
+  .speed{position:fixed;right:22px;bottom:24px;z-index:9;display:flex;gap:6px;align-items:center;
+    font-family:var(--mono);font-size:11px;color:var(--mute)}
+  .speed button{background:rgba(12,17,40,.7);border:1px solid rgba(105,183,255,.2);color:var(--fg);
+    width:30px;height:30px;border-radius:8px;cursor:pointer}
+  @media(max-width:640px){.intro{top:auto;bottom:150px;transform:none}.intro.hide{transform:translateX(-30px)}
+    .speed{display:none}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<div class="top">
+  <div class="brand">LISSAN&nbsp;KOIRALA <small>/ orbit</small></div>
+  <div class="r">
+    <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a>
+    <a href="mailto:lissanartist@gmail.com">Contact</a>
+  </div>
+</div>
+
+<div class="intro" id="intro">
+  <div class="tag">// A SYSTEM OF THINGS I'VE BUILT</div>
+  <h1>Everything I make,<br>in orbit.</h1>
+  <p>Engineer working across AI agents, quantum computing, quant trading and computer vision. Each body below is a real project — the closer to the star, the more recent.</p>
+  <div class="hintline"><span class="pulse"></span> Click a planet · drag to look around</div>
+</div>
+
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="close" aria-label="Close">✕</button>
+  <div class="pyear" id="pyear"></div>
+  <h2 id="ptitle"></h2>
+  <div class="pull" id="ppull"></div>
+  <p class="body" id="pbody"></p>
+  <div class="tags" id="ptags"></div>
+  <a class="visit" id="pvisit" target="_blank" rel="noreferrer">Visit project ↗</a>
+  <div class="meta" id="pmeta"></div>
+</aside>
+
+<div class="dock" id="dock"></div>
+<div class="speed">
+  <button id="slow" title="slower">−</button><span id="spd">1.0×</span><button id="fast" title="faster">+</button>
+</div>
+
+<script>
+const PROJECTS=[
+  {t:"WorldEval / WorldArena",y:"2026",col:"#7b5cff",r:2.2,size:15,pull:"Evaluate what a model does, not only what it says.",
+   d:"An evaluation framework for LLM agents in interactive, deterministic 3D worlds. Three independently-configured models receive partial observations, submit sealed plans under a commit/lock/reveal protocol, and live with the physical, economic and social consequences inside an authoritative Godot simulation.",
+   tags:["Python","Godot 4.5","FastAPI","LLM agents"],url:"https://github.com/LissanKoirala/WorldEval",meta:"Research prototype · deterministic Godot sim · 99-match benchmark season"},
+  {t:"Quantum Junction",y:"2026",col:"#20e3ff",r:3.2,size:12,pull:"Choose the right simulator before spending the compute.",
+   d:"A compute-aware pipeline for cracking obfuscated peaked quantum circuits. A method selector reads each circuit's structure and routes it to the cheapest attack likely to work — exact statevector, Aer MPS, tensor-network contraction or MPO unswapping. Solved 41 of 49 challenge circuits.",
+   tags:["Qiskit","Tensor networks","Quimb","MPS/MPO"],url:"https://github.com/LissanKoirala/quantum-junction",meta:"QMill Quantum Peak Challenge · 41/49 circuits solved"},
+  {t:"Advisory Workbench",y:"2026",col:"#ff5ca8",r:4.15,size:12,pull:"The agent proposes, the human decides — every claim cited.",
+   d:"A provenance-first wealth-advisory workbench for relationship managers, built at SwissHacks 2026 for SIX. It grows a living client profile from CRM history, watches news against it, and proposes CIO-approved, same-sector swaps strictly inside the client's mandate. Every alert carries a citation; nothing auto-executes.",
+   tags:["Next.js","FastAPI","Provenance","Fintech"],url:"https://github.com/LissanKoirala/SwissHacks-Six",meta:"SwissHacks 2026 · SIX · Noumena Digital · NTT DATA"},
+  {t:"Algo",y:"2026",col:"#ffb454",r:5.0,size:11,pull:"Signals in, positions out.",
+   d:"A live algorithmic trading system with a positions dashboard, in active development at algo.lissan.dev.",
+   tags:["Python","Live data","Quant"],url:"https://algo.lissan.dev/positions-dashboard",meta:"Active development · algo.lissan.dev"},
+  {t:"Aurora Visibility",y:"2025",col:"#8ec07c",r:5.9,size:11,pull:"Where can you really see the northern lights tonight?",
+   d:"A satellite-data pipeline built for the CASSINI Hackathon that scores real-world aurora visibility — fusing the OVATION auroral-oval model with Sentinel cloud optical thickness, cloud-base height and urban light-pollution layers into interactive maps.",
+   tags:["Sentinel","OVATION","GIS","Python"],url:"https://github.com/LissanKoirala/cassini-hackathon",meta:"CASSINI Hackathon · Earth-observation data"},
+  {t:"Underground Live Map",y:"2025",col:"#69b7ff",r:6.7,size:10,pull:"Watch London move.",
+   d:"A live map animating the London Underground and London bus network in real time.",
+   tags:["JavaScript","Transit","Real-time"],url:"https://github.com/LissanKoirala/underground-live-map",meta:"Real-time transit visualisation"},
+  {t:"God's Eye",y:"2024",col:"#c8a0ff",r:7.5,size:10,pull:"Every camera, one eye.",
+   d:"A multi-camera surveillance and person-tracking system, inspired by the film Fast & Furious.",
+   tags:["OpenCV","Computer vision"],url:"https://godseye.lissan.dev",meta:"godseye.lissan.dev"},
+  {t:"Solar System Simulation",y:"2023",col:"#ffd479",r:8.4,size:12,pull:"Newton's laws, one time-step at a time.",
+   d:"An N-body simulation of the solar system, used to study how Comet Halley orbits — with accompanying Kepler and Halley papers.",
+   tags:["Python","Physics","N-body"],url:"https://github.com/LissanKoirala/Solar-System-Simulation",meta:"N-body physics · Kepler & Halley papers"},
+  {t:"Robot Vision",y:"2022",col:"#ff8f6b",r:9.2,size:10,pull:"Sight, then motion.",
+   d:"A 3D-printed robot controlled programmatically through a computer-vision pipeline.",
+   tags:["Python","OpenCV","Robotics"],url:"https://github.com/LissanKoirala/Robot-Vision",meta:"3D-printed hardware · CV control loop"}
+];
+
+const cv=document.getElementById('sky'),ctx=cv.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2),cx,cy,unit;
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let stars=[];
+function resize(){
+  W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;
+  cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  cx=W/2;cy=H/2;
+  unit=Math.min(W,H)/ (10.6*2); // fit largest orbit (r≈9.2) comfortably
+  stars=Array.from({length:Math.floor(W*H/9000)},()=>({
+    x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3*DPR+.2,
+    a:Math.random()*.7+.15,tw:Math.random()*.02}));
+}
+resize();addEventListener('resize',resize);
+
+// each planet has angle + speed (inner = faster)
+PROJECTS.forEach((p,i)=>{p.ang=Math.random()*Math.PI*2;p.spd=(0.16/Math.sqrt(p.r))*(reduce?0:1);});
+let tilt=0.52, yaw=0, speedMul=1, t=0;
+let hoverIdx=-1, dragging=false, lastX=0;
+
+function planetPos(p){
+  const R=p.r*unit;
+  let x=Math.cos(p.ang)*R, y=Math.sin(p.ang)*R*tilt; // ellipse (tilted plane)
+  // yaw rotate around vertical for drag-look
+  const xr=x*Math.cos(yaw), depth=x*Math.sin(yaw);
+  return {x:cx+xr, y:cy+y, depth:depth};
+}
+
+function draw(){
+  t++;
+  ctx.clearRect(0,0,W,H);
+  // stars
+  for(const s of stars){s.a+=s.tw*(Math.random()>.5?1:-1);s.a=Math.max(.1,Math.min(.9,s.a));
+    ctx.globalAlpha=s.a;ctx.fillStyle='#aab6e8';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill();}
+  ctx.globalAlpha=1;
+
+  // orbit rings
+  for(const p of PROJECTS){
+    ctx.strokeStyle='rgba(120,140,210,.12)';ctx.lineWidth=DPR;
+    ctx.beginPath();ctx.ellipse(cx,cy,p.r*unit*Math.abs(Math.cos(yaw))+p.r*unit*Math.abs(Math.sin(yaw))*.0, p.r*unit*tilt,0,0,7);
+    // simpler: draw tilted ellipse ignoring yaw squish for clarity
+    ctx.beginPath();ctx.ellipse(cx,cy,p.r*unit, p.r*unit*tilt,0,0,7);ctx.stroke();
+  }
+
+  // sun
+  const sunR=unit*0.9;
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,sunR*2.6);
+  g.addColorStop(0,'rgba(255,240,200,.95)');g.addColorStop(.25,'rgba(255,180,90,.5)');
+  g.addColorStop(1,'rgba(255,120,60,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,sunR*2.6,0,7);ctx.fill();
+  ctx.fillStyle='#fff3d0';ctx.beginPath();ctx.arc(cx,cy,sunR*0.6,0,7);ctx.fill();
+  // sun label
+  ctx.fillStyle='rgba(255,240,210,.9)';ctx.font=`600 ${13*DPR}px var(--font),sans-serif`;
+  ctx.textAlign='center';ctx.fillText('LISSAN.DEV',cx,cy+sunR*0.6+18*DPR);
+
+  // update + sort by depth for pseudo-3D
+  const order=PROJECTS.map((p,i)=>{p.ang+=p.spd*speedMul*0.02;const pos=planetPos(p);return {i,p,pos};})
+                      .sort((a,b)=>a.pos.depth-b.pos.depth);
+  for(const {i,p,pos} of order){
+    const sc=1+pos.depth/W*0.6; // nearer = bigger
+    const rad=p.size*DPR*Math.max(.55,sc);
+    // glow
+    const gg=ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,rad*2.4);
+    gg.addColorStop(0,p.col);gg.addColorStop(1,'transparent');
+    ctx.globalAlpha=hoverIdx===i?.55:.32;ctx.fillStyle=gg;
+    ctx.beginPath();ctx.arc(pos.x,pos.y,rad*2.4,0,7);ctx.fill();ctx.globalAlpha=1;
+    // body
+    const bg=ctx.createRadialGradient(pos.x-rad*.4,pos.y-rad*.4,rad*.1,pos.x,pos.y,rad);
+    bg.addColorStop(0,'#fff');bg.addColorStop(.25,p.col);bg.addColorStop(1,shade(p.col,-40));
+    ctx.fillStyle=bg;ctx.beginPath();ctx.arc(pos.x,pos.y,rad,0,7);ctx.fill();
+    if(hoverIdx===i){ctx.strokeStyle='#fff';ctx.lineWidth=2*DPR;ctx.beginPath();ctx.arc(pos.x,pos.y,rad+5*DPR,0,7);ctx.stroke();}
+    // label
+    ctx.globalAlpha=hoverIdx===i?1:.8;
+    ctx.fillStyle='#dfe6ff';ctx.font=`${(hoverIdx===i?600:400)} ${12*DPR}px var(--font),sans-serif`;
+    ctx.textAlign='left';ctx.fillText(p.t,pos.x+rad+8*DPR,pos.y+4*DPR);
+    ctx.globalAlpha=1;
+    p._pos=pos;p._rad=rad;
+  }
+  requestAnimationFrame(draw);
+}
+function shade(hex,amt){
+  const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
+  r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+  return `rgb(${r},${g},${b})`;
+}
+draw();
+
+// interaction
+function hit(mx,my){
+  let best=-1,bd=1e9;
+  PROJECTS.forEach((p,i)=>{if(!p._pos)return;const d=Math.hypot(mx-p._pos.x,my-p._pos.y);
+    if(d<p._rad+14*DPR&&d<bd){bd=d;best=i;}});
+  return best;
+}
+cv.addEventListener('mousemove',e=>{
+  if(dragging){yaw+=(e.clientX-lastX)*0.006;lastX=e.clientX;return;}
+  const mx=e.clientX*DPR,my=e.clientY*DPR;const h=hit(mx,my);
+  hoverIdx=h;cv.style.cursor=h>=0?'pointer':'grab';
+});
+cv.addEventListener('mousedown',e=>{dragging=true;lastX=e.clientX;cv.classList.add('drag');});
+addEventListener('mouseup',e=>{
+  if(dragging&&Math.abs(e.clientX-lastX)<4){const h=hit(e.clientX*DPR,e.clientY*DPR);if(h>=0)openPanel(h);}
+  dragging=false;cv.classList.remove('drag');
+});
+cv.addEventListener('click',e=>{const h=hit(e.clientX*DPR,e.clientY*DPR);if(h>=0)openPanel(h);});
+// touch
+cv.addEventListener('touchstart',e=>{const tch=e.touches[0];lastX=tch.clientX;dragging=true;},{passive:true});
+cv.addEventListener('touchmove',e=>{const tch=e.touches[0];yaw+=(tch.clientX-lastX)*0.006;lastX=tch.clientX;},{passive:true});
+cv.addEventListener('touchend',e=>{const tch=e.changedTouches[0];const h=hit(tch.clientX*DPR,tch.clientY*DPR);if(h>=0)openPanel(h);dragging=false;});
+
+const panel=document.getElementById('panel'),intro=document.getElementById('intro');
+function openPanel(i){
+  const p=PROJECTS[i];
+  document.getElementById('pyear').textContent='◆ '+p.y;
+  document.getElementById('ptitle').textContent=p.t;
+  document.getElementById('ppull').textContent='“'+p.pull+'”';
+  document.getElementById('pbody').textContent=p.d;
+  document.getElementById('ptags').innerHTML=p.tags.map(t=>`<span>${t}</span>`).join('');
+  document.getElementById('pvisit').href=p.url;
+  document.getElementById('pmeta').textContent=p.meta;
+  panel.style.setProperty('border-left-color',p.col);
+  panel.classList.add('open');panel.setAttribute('aria-hidden','false');
+  intro.classList.add('hide');
+}
+document.getElementById('close').onclick=()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true');};
+addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('close').click();});
+
+// dock
+document.getElementById('dock').innerHTML=PROJECTS.map((p,i)=>
+  `<button data-i="${i}"><span class="d" style="background:${p.col}"></span>${p.t.split(' ')[0]}</button>`).join('');
+document.getElementById('dock').addEventListener('click',e=>{const b=e.target.closest('button');if(b)openPanel(+b.dataset.i);});
+
+// speed
+const spd=document.getElementById('spd');
+document.getElementById('fast').onclick=()=>{speedMul=Math.min(4,speedMul+.5);spd.textContent=speedMul.toFixed(1)+'×';};
+document.getElementById('slow').onclick=()=>{speedMul=Math.max(0,speedMul-.5);spd.textContent=speedMul.toFixed(1)+'×';};
+</script>
+</body>
+</html>

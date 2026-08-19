@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lissan.dev — Design Directions</title>
+<style>
+  :root{
+    --bg:#0b0c10; --card:#15171e; --fg:#eef1f7; --mute:#8a92a6; --line:#242833;
+    --accent:#69b7ff;
+    --font:"Inter","Space Grotesk","Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.6;
+    background-image:radial-gradient(ellipse at 50% -10%,rgba(105,183,255,.10),transparent 55%)}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(28px,6vw,72px) clamp(18px,4vw,32px)}
+  header{text-align:center;margin-bottom:54px}
+  .kicker{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+  h1{font-size:clamp(34px,6vw,62px);font-weight:800;letter-spacing:-.03em;margin:16px 0 0;line-height:1.02}
+  header p{color:var(--mute);max-width:60ch;margin:20px auto 0;font-size:clamp(15px,2vw,18px)}
+  .note{margin:26px auto 0;max-width:64ch;font-size:14px;color:var(--mute);
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;text-align:left}
+  .note b{color:var(--fg)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .opt{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    transition:transform .2s,border-color .2s,box-shadow .2s}
+  .opt:hover{transform:translateY(-5px);border-color:var(--edge);box-shadow:0 20px 50px -24px var(--edge)}
+  .thumb{height:150px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+    display:grid;place-items:center}
+  .opt .body{padding:20px 22px 24px}
+  .opt .n{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .opt h2{font-size:22px;font-weight:700;margin:6px 0 6px;letter-spacing:-.01em}
+  .opt p{color:var(--mute);font-size:14px}
+  .opt .mood{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+  .opt .mood span{font-size:11px;font-family:var(--mono);color:var(--mute);border:1px solid var(--line);
+    border-radius:6px;padding:3px 8px}
+  .opt .go{position:absolute;top:16px;right:18px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);
+    color:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:15px;
+    opacity:0;transform:translateX(-6px);transition:.2s}
+  .opt:hover .go{opacity:1;transform:translateX(0)}
+
+  /* mini thumbnails, pure CSS, each evoking its design */
+  .t-term{background:#0a0e0a;color:#ffb454;font-family:var(--mono);font-size:11px;width:100%;height:100%;
+    padding:14px 16px;text-align:left}
+  .t-term b{color:#8ec07c}
+  .t-edit{background:#f4f1ea;color:#141414;width:100%;height:100%;display:flex;flex-direction:column;
+    justify-content:center;padding:0 22px;font-family:"Palatino Linotype",Georgia,serif}
+  .t-edit .d{font-size:34px;line-height:.9;font-weight:400}
+  .t-edit .r{height:2px;background:#141414;margin:10px 0}
+  .t-edit .s{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#c8442a;font-family:var(--font)}
+  .t-quan{background:radial-gradient(circle at 30% 30%,rgba(123,92,255,.5),transparent 60%),radial-gradient(circle at 75% 70%,rgba(32,227,255,.4),transparent 55%),#05060c;width:100%;height:100%;position:relative}
+  .t-quan::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:22px 22px;opacity:.25}
+  .t-brut{background:#ffe600;width:100%;height:100%;display:grid;place-items:center;
+    background-image:linear-gradient(#111 1px,transparent 1px),linear-gradient(90deg,#111 1px,transparent 1px);background-size:20px 20px}
+  .t-brut b{font-family:"Arial Black",sans-serif;text-transform:uppercase;color:#111;background:#ff5da2;
+    border:3px solid #111;box-shadow:5px 5px 0 #111;padding:8px 14px;font-size:20px;transform:rotate(-3deg)}
+  .t-orb{background:radial-gradient(ellipse at 50% 45%,#0a1030,#03040a 70%);width:100%;height:100%;position:relative;overflow:hidden}
+  .t-orb .sun{position:absolute;left:50%;top:50%;width:26px;height:26px;border-radius:50%;
+    transform:translate(-50%,-50%);background:#fff3d0;box-shadow:0 0 26px 10px rgba(255,180,90,.6)}
+  .t-orb .ring{position:absolute;left:50%;top:50%;border:1px solid rgba(120,140,210,.25);border-radius:50%;transform:translate(-50%,-50%)}
+  .t-orb .p{position:absolute;border-radius:50%}
+  .t-bento{background:#eef0f4;width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(2,1fr);gap:6px;padding:14px}
+  .t-bento i{border-radius:7px;display:block}
+  @media(prefers-color-scheme:light){body{--bg:#eef0f4;--card:#fff;--fg:#15171c;--mute:#5c6373;--line:#e2e5ec}}
+  footer{text-align:center;color:var(--mute);font-size:13px;margin-top:50px;font-family:var(--mono)}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">lissan.dev · portfolio rebuild</div>
+    <h1>Directions,<br>one you.</h1>
+    <p>Fully-working, wildly different takes on a personal portfolio — same real content, radically different feel. The <b style="color:var(--fg)">terminal</b> and <b style="color:var(--fg)">orbital</b> concepts are each expanded into five variations of their own (the ★ cards). Open any, live with it, then tell me which to take all the way.</p>
+    <div class="note">
+      <b>Note:</b> every project shown is real and pulled from your GitHub — WorldEval, Quantum Junction, the SwissHacks Advisory Workbench, the CASSINI aurora build, and the rest. No biography, employer, or education claims were invented; a couple of framing lines (e.g. "based in the UK") are placeholders for you to confirm or cut.
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    Built on branch <a href="#">claude/lissan-dev-update-9o79ht</a> · pick a favourite and I'll polish it into the real lissan.dev
+  </footer>
+</div>
+
+<script>
+const OPTS=[
+  {file:"terminal/index.html",n:"★",edge:"#ffb454",title:"Terminal — 5 variations",count:"5 inside",
+   desc:"Pushed further: five totally different terminal metaphors — a BIOS, the Matrix, a chat client, a vim editor and a file manager.",
+   mood:["family","interactive","5 takes"],
+   thumb:`<div class="t-term"><span style="color:#8a7a52">$</span> ls terminal/<br><b>bios</b> matrix irc<br><b>editor</b> filemanager<br><span style="color:#7cd6e0">5 directions →</span></div>`},
+  {file:"orbital/index.html",n:"★",edge:"#69b7ff",title:"Orbital — 5 variations",count:"5 inside",
+   desc:"Pushed further: five ways to set the work in motion — a spiral galaxy, a constellation chart, an atom, a gravity sandbox and a clockwork orrery.",
+   mood:["family","canvas","5 takes"],
+   thumb:`<div class="t-orb"><div class="ring" style="width:70px;height:42px"></div><div class="ring" style="width:130px;height:78px"></div><div class="sun"></div><div class="p" style="width:9px;height:9px;background:#c9a6ff;left:calc(50% + 48px);top:calc(50% - 6px)"></div><div class="p" style="width:8px;height:8px;background:#38e8ff;left:calc(50% - 54px);top:calc(50% + 10px)"></div><div class="p" style="width:9px;height:9px;background:#4dff9e;left:calc(50% + 2px);top:calc(50% + 44px)"></div></div>`},
+  {file:"01-terminal.html",n:"01",edge:"#ffb454",title:"The Terminal",
+   desc:"An interactive shell. Type commands, boot sequence, amber phosphor CRT. For the hacker/builder identity.",
+   mood:["interactive","monospace","playful"],
+   thumb:`<div class="t-term"><span style="color:#8a7a52">visitor@lissan.dev:~$</span> projects<br><b>worldeval</b> WorldEval [2026]<br><b>quantum&nbsp;</b> Quantum Junction<br><span style="color:#7cd6e0">_</span></div>`},
+  {file:"02-editorial.html",n:"02",edge:"#c8442a",title:"The Editorial",
+   desc:"Swiss-typographic print magazine. Big serif, whitespace, rules, one red accent. Calm and refined.",
+   mood:["typographic","print","minimal"],
+   thumb:`<div class="t-edit"><div class="s">Selected Works</div><div class="d">Building things<br>that <em>act</em>.</div><div class="r"></div></div>`},
+  {file:"03-quantum.html",n:"03",edge:"#7b5cff",title:"The Quantum Lab",
+   desc:"Dark, futuristic, an animated particle field that reacts to your cursor. Glass cards, neon gradients.",
+   mood:["animated","dark","futuristic"],
+   thumb:`<div class="t-quan"></div>`},
+  {file:"04-brutalist.html",n:"04",edge:"#ff5da2",title:"The Brutalist",
+   desc:"Loud neo-brutalism — thick borders, hard shadows, a marquee, blocky colour. High energy, unmissable.",
+   mood:["bold","colourful","loud"],
+   thumb:`<div class="t-brut"><b>I Build<br>Stuff</b></div>`},
+  {file:"05-orbital.html",n:"05",edge:"#69b7ff",title:"The Orbit",
+   desc:"An interactive solar system — projects orbit a star, click a planet to open it. A nod to the physics sims.",
+   mood:["interactive","canvas","spatial"],
+   thumb:`<div class="t-orb"><div class="ring" style="width:60px;height:36px"></div><div class="ring" style="width:110px;height:64px"></div><div class="ring" style="width:160px;height:92px"></div><div class="sun"></div><div class="p" style="width:9px;height:9px;background:#7b5cff;left:calc(50% + 40px);top:calc(50% - 6px)"></div><div class="p" style="width:8px;height:8px;background:#20e3ff;left:calc(50% - 66px);top:calc(50% + 8px)"></div><div class="p" style="width:10px;height:10px;background:#ff5ca8;left:calc(50% + 6px);top:calc(50% + 40px)"></div></div>`},
+  {file:"06-bento.html",n:"06",edge:"#6d5cff",title:"The Dashboard",
+   desc:"A modern bento-grid overview — mixed tiles, stats, light mode, colour. Clean startup-portfolio energy.",
+   mood:["grid","clean","modern"],
+   thumb:`<div class="t-bento"><i style="background:linear-gradient(135deg,#6d5cff,#ff5a8a);grid-row:span 2"></i><i style="background:#2d7bff33"></i><i style="background:#12b5a533"></i><i style="background:#ffb02033"></i><i style="background:#ff5a8a33"></i></div>`}
+];
+document.getElementById('grid').innerHTML=OPTS.map(o=>`
+  <a class="opt" href="${o.file}" style="--edge:${o.edge}">
+    <span class="go">↗</span>
+    <div class="thumb">${o.thumb}</div>
+    <div class="body">
+      <div class="n">${o.count?'FAMILY':'DIRECTION '+o.n}${o.count?' · '+o.count:''}</div>
+      <h2>${o.title}</h2>
+      <p>${o.desc}</p>
+      <div class="mood">${o.mood.map(m=>`<span>${m}</span>`).join('')}</div>
+    </div>
+  </a>`).join('');
+</script>
+</body>
+</html>

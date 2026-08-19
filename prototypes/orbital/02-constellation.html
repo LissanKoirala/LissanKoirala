@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Star Chart</title>
+<style>
+  :root{--ink:#0a1420;--fg:#dfe9f5;--mute:#5f7590;--line:rgba(120,160,210,.14);
+    --gold:#f2d59b;--accent:#8fd0ff;--serif:"Iowan Old Style",Palatino,Georgia,serif;--mono:ui-monospace,Menlo,monospace}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{background:radial-gradient(ellipse at 50% 30%,#122236,#050b14 75%);color:var(--fg);font-family:var(--serif)}
+  canvas{position:fixed;inset:0;cursor:crosshair}
+  .frame{position:fixed;inset:14px;border:1px solid var(--line);pointer-events:none;z-index:5}
+  .frame::before{content:"";position:absolute;inset:6px;border:1px solid var(--line)}
+  .corner{position:fixed;z-index:6;color:var(--mute);font-family:var(--mono);font-size:11px;letter-spacing:.15em;pointer-events:none}
+  .tl{top:26px;left:30px}.tr{top:60px;right:30px;text-align:right}.bl{bottom:26px;left:30px}.br{bottom:26px;right:30px;text-align:right}
+  .title{position:fixed;top:0;left:0;right:0;z-index:8;text-align:center;padding-top:min(9vh,80px);pointer-events:none}
+  .title .k{font-family:var(--mono);font-size:12px;letter-spacing:.35em;color:var(--accent);text-transform:uppercase}
+  .title h1{font-size:clamp(30px,5.4vw,58px);font-weight:400;letter-spacing:.02em;margin-top:12px}
+  .title h1 em{color:var(--gold);font-style:italic}
+  .title p{color:var(--mute);margin-top:12px;font-size:15px;font-family:var(--mono)}
+  .top{position:fixed;top:26px;left:50%;transform:translateX(-50%);z-index:9;display:none}
+  .legend{position:fixed;left:30px;bottom:56px;z-index:8;max-width:260px;color:var(--mute);font-family:var(--mono);font-size:12px;pointer-events:none}
+  nav{position:fixed;top:22px;right:34px;z-index:10;display:flex;gap:20px;font-family:var(--mono);font-size:13px}
+  nav a{color:var(--mute);text-decoration:none}nav a:hover{color:var(--fg)}
+  /* card */
+  .card{position:fixed;z-index:14;width:320px;max-width:88vw;background:rgba(10,20,32,.94);
+    border:1px solid rgba(143,208,255,.35);border-radius:10px;padding:18px 20px;backdrop-filter:blur(8px);
+    opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none;
+    box-shadow:0 20px 60px -20px #000}
+  .card.show{opacity:1;transform:none;pointer-events:auto}
+  .card .con{font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase}
+  .card h2{font-size:22px;font-weight:400;margin:4px 0 2px}
+  .card .yr{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .card .pull{color:var(--gold);font-style:italic;margin:10px 0}
+  .card p{color:#c2d2e6;font-size:14px;line-height:1.55}
+  .card .tags{font-family:var(--mono);font-size:11px;color:var(--mute);margin:12px 0 10px}
+  .card a{color:var(--accent);font-family:var(--mono);font-size:13px;text-decoration:none;border-bottom:1px solid var(--line)}
+  .card a:hover{border-color:var(--accent)}
+  .dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9;display:flex;gap:4px;
+    background:rgba(10,20,32,.7);border:1px solid var(--line);border-radius:12px;padding:6px;max-width:94vw;overflow-x:auto;scrollbar-width:none;font-family:var(--mono)}
+  .dock::-webkit-scrollbar{display:none}
+  .dock button{background:none;border:none;color:var(--mute);font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  .dock button:hover{color:var(--gold);background:rgba(255,255,255,.04)}
+  @media(max-width:640px){.legend{display:none}.title h1{font-size:30px}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="frame"></div>
+<nav><a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a><a href="mailto:lissanartist@gmail.com">Contact</a></nav>
+<div class="corner tl" id="tl">R.A. 00ʰ — 24ʰ</div>
+<div class="corner tr">CHART OF L. KOIRALA<br>lissan.dev</div>
+<div class="corner bl">EPOCH 2026.0</div>
+<div class="corner br" id="br">DEC −90° — +90°</div>
+<div class="title" id="title">
+  <div class="k">Uranometria Personalis</div>
+  <h1>The works of Lissan Koirala,<br><em>charted as stars</em>.</h1>
+  <p>hover a star to trace its constellation · click to open</p>
+</div>
+<div class="legend">✦ Nine catalogued objects across four regions of sky: agents, quantum, quant &amp; vision. Brighter magnitude = more recent.</div>
+<div class="card" id="card"></div>
+<div class="dock" id="dock"></div>
+
+<script>
+const P=[
+ {t:'WorldEval / WorldArena',con:'Agentis',yr:'2026',mag:1,pull:'Evaluate what a model does, not only what it says.',d:'LLM agents in deterministic 3D worlds — sealed plans, real consequences, an authoritative Godot simulation.',tags:['Python','Godot 4.5','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval'},
+ {t:'Quantum Junction',con:'Quantis',yr:'2026',mag:1,pull:'Choose the right simulator before spending the compute.',d:'Reads each obfuscated peaked quantum circuit and routes it to the cheapest attack. 41/49 solved.',tags:['Qiskit','Tensor nets','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction'},
+ {t:'Advisory Workbench',con:'Mercatoris',yr:'2026',mag:1,pull:'The agent proposes, the human decides — every claim cited.',d:'SwissHacks 2026 for SIX — a provenance-first wealth-advisory workbench. Nothing auto-executes.',tags:['Next.js','FastAPI','Fintech'],url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {t:'Aurora Visibility',con:'Agentis',yr:'2025',mag:2,pull:'Where can you really see the northern lights tonight?',d:'CASSINI Hackathon: OVATION oval model fused with Sentinel cloud and light-pollution layers.',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {t:'Algo',con:'Mercatoris',yr:'2026',mag:2,pull:'Signals in, positions out.',d:'A live algorithmic trading system with a positions dashboard.',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard'},
+ {t:'Underground Live Map',con:'Agentis',yr:'2025',mag:3,pull:'Watch London move.',d:'A live map of the London Underground and buses, in real time.',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map'},
+ {t:"God's Eye",con:'Visionis',yr:'2024',mag:3,pull:'Every camera, one eye.',d:'Multi-camera surveillance & person tracking, inspired by Fast & Furious.',tags:['OpenCV'],url:'https://godseye.lissan.dev'},
+ {t:'Solar System Simulation',con:'Visionis',yr:'2023',mag:2,pull:"Newton's laws, one time-step at a time.",d:'An N-body simulation studying Comet Halley\'s orbit, with papers.',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {t:'Robot Vision',con:'Visionis',yr:'2022',mag:3,pull:'Sight, then motion.',d:'A 3D-printed robot controlled programmatically through a computer-vision pipeline.',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+// fixed positions (normalized 0..1) grouped by constellation region
+const POS={
+ 'WorldEval / WorldArena':[.30,.40],'Aurora Visibility':[.22,.55],'Underground Live Map':[.38,.60],
+ 'Quantum Junction':[.62,.34],
+ 'Advisory Workbench':[.72,.58],'Algo':[.82,.46],
+ "God's Eye":[.55,.72],'Solar System Simulation':[.66,.80],'Robot Vision':[.48,.84]
+};
+const CONLINES={ // index chains within each constellation
+ Agentis:['WorldEval / WorldArena','Aurora Visibility','Underground Live Map'],
+ Quantis:['Quantum Junction'],
+ Mercatoris:['Advisory Workbench','Algo'],
+ Visionis:["God's Eye",'Solar System Simulation','Robot Vision','God\'s Eye']
+};
+P.forEach(p=>{p.pos=POS[p.t];});
+
+const c=document.getElementById('c'),x=c.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2);
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let bg=[];
+function resize(){W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
+  bg=Array.from({length:Math.floor(W*H/7000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2*DPR+.2,b:Math.random()*.6+.15,tw:Math.random()*6}));}
+resize();addEventListener('resize',resize);
+function sx(p){return p.pos[0]*W;} function sy(p){return p.pos[1]*H;}
+let hover=-1,t=0;
+function draw(){
+  t+=reduce?0:0.02;
+  x.fillStyle='rgba(5,11,20,1)';x.fillRect(0,0,W,H);
+  // grid (RA/Dec)
+  x.strokeStyle='rgba(120,160,210,.08)';x.lineWidth=DPR;
+  for(let i=1;i<12;i++){x.beginPath();x.moveTo(W*i/12,0);x.lineTo(W*i/12,H);x.stroke();}
+  for(let j=1;j<8;j++){x.beginPath();x.moveTo(0,H*j/8);x.lineTo(W,H*j/8);x.stroke();}
+  // ecliptic (sine curve)
+  x.strokeStyle='rgba(242,213,155,.16)';x.lineWidth=DPR*1.4;x.beginPath();
+  for(let i=0;i<=W;i+=6){const yy=H*0.5+Math.sin(i/W*Math.PI*2)*H*0.14;i===0?x.moveTo(i,yy):x.lineTo(i,yy);}x.stroke();
+  // bg stars
+  for(const s of bg){const tw=0.6+Math.sin(t+s.tw)*0.4;x.globalAlpha=s.b*tw;x.fillStyle='#cdddf0';
+    x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill();}x.globalAlpha=1;
+  // constellation lines
+  const activeCon = hover>=0? P[hover].con : null;
+  Object.entries(CONLINES).forEach(([con,chain])=>{
+    const on = con===activeCon;
+    x.strokeStyle= on? 'rgba(143,208,255,.8)':'rgba(143,208,255,.16)';
+    x.lineWidth=(on?1.8:1)*DPR; x.setLineDash(on?[]:[4*DPR,5*DPR]);
+    x.beginPath();let started=false;
+    chain.forEach(name=>{const p=P.find(q=>q.t===name);if(!p)return;const px=sx(p),py=sy(p);
+      started?x.lineTo(px,py):x.moveTo(px,py);started=true;});
+    x.stroke();x.setLineDash([]);
+    // constellation label
+    if(on){const first=P.find(q=>q.t===chain[0]);if(first){x.fillStyle='rgba(143,208,255,.55)';
+      x.font=`italic ${16*DPR}px var(--serif),serif`;x.textAlign='left';x.fillText(con,sx(first)+14*DPR,sy(first)-14*DPR);}}
+  });
+  // stars
+  P.forEach((p,i)=>{
+    const px=sx(p),py=sy(p);const on=hover===i||(activeCon&&p.con===activeCon);
+    const rad=(5-p.mag)*2.2*DPR*(hover===i?1.4:1);
+    const tw=0.75+Math.sin(t*1.3+i)*0.25;
+    const g=x.createRadialGradient(px,py,0,px,py,rad*4);
+    g.addColorStop(0, hover===i?'#ffffff':'#f2d59b');g.addColorStop(.5,'rgba(242,213,155,.4)');g.addColorStop(1,'transparent');
+    x.globalAlpha=(on?.9:.6)*tw;x.fillStyle=g;x.beginPath();x.arc(px,py,rad*4,0,7);x.fill();
+    x.globalAlpha=1;x.fillStyle='#fff';x.beginPath();x.arc(px,py,rad*.7,0,7);x.fill();
+    // 4-point diffraction spikes for bright
+    if(p.mag<=2){x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=DPR;x.beginPath();
+      x.moveTo(px-rad*2.4,py);x.lineTo(px+rad*2.4,py);x.moveTo(px,py-rad*2.4);x.lineTo(px,py+rad*2.4);x.stroke();}
+    // name
+    x.fillStyle= on?'#eaf3ff':'rgba(223,233,245,.55)';
+    x.font=`${on?500:400} ${12*DPR}px var(--mono),monospace`;x.textAlign='left';
+    x.fillText(p.t, px+rad+8*DPR, py+4*DPR);
+    p._px=px;p._py=py;p._r=rad;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+const card=document.getElementById('card');
+function hit(mx,my){let b=-1,bd=1e9;P.forEach((p,i)=>{const d=Math.hypot(mx-p._px,my-p._py);if(d<26*DPR&&d<bd){bd=d;b=i;}});return b;}
+c.addEventListener('mousemove',e=>{const mx=e.clientX*DPR,my=e.clientY*DPR;const h=hit(mx,my);
+  if(h!==hover){hover=h;if(h>=0)showCard(h,e.clientX,e.clientY);else hideCard();}
+  else if(h>=0)positionCard(e.clientX,e.clientY);
+  c.style.cursor=h>=0?'pointer':'crosshair';});
+c.addEventListener('click',e=>{const h=hit(e.clientX*DPR,e.clientY*DPR);if(h>=0)window.open(P[h].url,'_blank');});
+function showCard(i,mx,my){const p=P[i];
+  card.innerHTML=`<div class="con">✦ ${p.con} · ${p.yr}</div><h2>${p.t}</h2>
+    <div class="pull">“${p.pull}”</div><p>${p.d}</p>
+    <div class="tags">${p.tags.join(' · ')}</div>
+    <a href="${p.url}" target="_blank" rel="noreferrer">Open catalogue entry ↗</a>`;
+  card.classList.add('show');document.getElementById('title').style.opacity=.15;positionCard(mx,my);}
+function positionCard(mx,my){const w=card.offsetWidth,h=card.offsetHeight;
+  let l=mx+20,t2=my+20;if(l+w>innerWidth-20)l=mx-w-20;if(t2+h>innerHeight-20)t2=my-h-20;
+  card.style.left=Math.max(16,l)+'px';card.style.top=Math.max(16,t2)+'px';}
+function hideCard(){card.classList.remove('show');document.getElementById('title').style.opacity=1;}
+card.addEventListener('mouseenter',()=>card.classList.add('show'));
+document.getElementById('dock').innerHTML=P.map((p,i)=>`<button data-i="${i}">✦ ${p.t.split(' ')[0]}</button>`).join('');
+document.getElementById('dock').addEventListener('click',e=>{const b=e.target.closest('button');if(b){const p=P[+b.dataset.i];
+  showCard(+b.dataset.i, p._px/DPR, p._py/DPR);}});
+</script>
+</body>
+</html>

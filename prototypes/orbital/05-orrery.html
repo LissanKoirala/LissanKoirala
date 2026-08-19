@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Orrery</title>
+<style>
+  :root{--navy:#0b1a2e;--navy2:#0a1526;--ink:#cfe4ff;--line:rgba(120,180,240,.30);--line-soft:rgba(120,180,240,.13);
+    --brass:#e8b96b;--cyan:#6fd0ff;--paper:#dfeeff;--mute:#6f8bb0;
+    --mono:"IBM Plex Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;--sans:"Space Grotesk","Segoe UI",system-ui,sans-serif}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{background:
+    radial-gradient(ellipse at 50% 45%,#12263f,#081422 80%);
+    color:var(--ink);font-family:var(--sans)}
+  canvas{position:fixed;inset:0;cursor:default}
+  /* blueprint border + title block */
+  .sheet{position:fixed;inset:16px;border:1.5px solid var(--line);pointer-events:none;z-index:5}
+  .sheet::before{content:"";position:absolute;inset:7px;border:1px solid var(--line-soft)}
+  .titleblock{position:fixed;right:16px;bottom:16px;z-index:7;border:1.5px solid var(--line);
+    background:rgba(8,20,34,.8);font-family:var(--mono);font-size:11px;color:var(--mute);width:min(340px,80vw)}
+  .titleblock .row{display:flex;border-bottom:1px solid var(--line-soft)}
+  .titleblock .row:last-child{border-bottom:none}
+  .titleblock .cell{padding:5px 9px;border-right:1px solid var(--line-soft)}
+  .titleblock .cell:last-child{border-right:none}
+  .titleblock .k{color:var(--mute)} .titleblock .v{color:var(--paper)}
+  .titleblock .big{color:var(--brass);font-size:13px;letter-spacing:.06em}
+  nav{position:fixed;top:26px;right:34px;z-index:10;display:flex;gap:18px;font-family:var(--mono);font-size:13px}
+  nav a{color:var(--mute);text-decoration:none}nav a:hover{color:var(--ink)}
+  .heading{position:fixed;top:26px;left:34px;z-index:8;font-family:var(--mono);pointer-events:none}
+  .heading .k{font-size:11px;letter-spacing:.3em;color:var(--cyan)}
+  .heading h1{font-family:var(--sans);font-weight:700;font-size:clamp(22px,3.4vw,34px);margin-top:8px;letter-spacing:-.01em}
+  .heading .sub{color:var(--mute);font-size:12px;margin-top:6px}
+  /* card */
+  .card{position:fixed;left:34px;bottom:34px;z-index:9;width:min(360px,84vw);
+    border:1.5px solid var(--brass);background:rgba(8,20,34,.92);backdrop-filter:blur(6px);
+    padding:18px 20px;opacity:0;transform:translateY(10px);transition:.28s;pointer-events:none}
+  .card.show{opacity:1;transform:none;pointer-events:auto}
+  .card .fig{font-family:var(--mono);font-size:11px;color:var(--brass);letter-spacing:.12em}
+  .card h2{font-size:22px;font-weight:700;margin:5px 0 2px}
+  .card .yr{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .card .pull{color:var(--cyan);font-style:italic;margin:9px 0}
+  .card p{color:#c2d6ef;font-size:14px;line-height:1.55}
+  .card .tags{font-family:var(--mono);font-size:11px;color:var(--mute);margin:12px 0 10px}
+  .card a{color:var(--brass);font-family:var(--mono);font-size:13px;text-decoration:none;border-bottom:1px solid var(--line)}
+  .card a:hover{border-color:var(--brass)}
+  .ctrls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9;display:flex;gap:6px;
+    background:rgba(8,20,34,.75);border:1px solid var(--line);border-radius:11px;padding:6px;font-family:var(--mono)}
+  .ctrls button{background:none;border:none;color:var(--mute);font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:7px;cursor:pointer}
+  .ctrls button:hover{color:var(--brass)}
+  @media(max-width:640px){.card{left:16px;right:16px;width:auto}.titleblock{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="sheet"></div>
+<nav><a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub ↗</a><a href="mailto:lissanartist@gmail.com">Contact</a></nav>
+<div class="heading">
+  <div class="k">PLATE I — MECHANISM</div>
+  <h1>The Koirala Orrery</h1>
+  <div class="sub">nine projects on geared arms · hover a body · click to open</div>
+</div>
+<div class="titleblock" id="tb">
+  <div class="row"><div class="cell big" style="flex:1">LISSAN KOIRALA</div><div class="cell">lissan.dev</div></div>
+  <div class="row"><div class="cell"><span class="k">DRAWN</span> <span class="v">L.K.</span></div><div class="cell"><span class="k">SCALE</span> <span class="v">N.T.S.</span></div><div class="cell"><span class="k">SHEET</span> <span class="v">1/1</span></div></div>
+  <div class="row"><div class="cell" style="flex:1"><span class="k">TITLE</span> <span class="v">Orrery of Works — agents · quantum · quant · vision</span></div></div>
+</div>
+<div class="card" id="card"></div>
+<div class="ctrls"><button id="slow">− slower</button><button id="spd">1.0×</button><button id="fast">faster +</button></div>
+
+<script>
+const P=[
+ {t:'WorldEval / WorldArena',ring:1,yr:'2026',pull:'Evaluate what a model does, not only what it says.',d:'LLM agents in deterministic 3D worlds — sealed plans, real consequences, an authoritative Godot simulation.',tags:['Python','Godot 4.5','FastAPI'],url:'https://github.com/LissanKoirala/WorldEval'},
+ {t:'Quantum Junction',ring:2,yr:'2026',pull:'Choose the right simulator before spending the compute.',d:'Reads each obfuscated peaked quantum circuit and routes it to the cheapest attack. 41/49 solved.',tags:['Qiskit','Tensor nets','Quimb'],url:'https://github.com/LissanKoirala/quantum-junction'},
+ {t:'Advisory Workbench',ring:3,yr:'2026',pull:'The agent proposes, the human decides — every claim cited.',d:'SwissHacks 2026 for SIX — a provenance-first wealth-advisory workbench. Nothing auto-executes.',tags:['Next.js','FastAPI','Fintech'],url:'https://github.com/LissanKoirala/SwissHacks-Six'},
+ {t:'Aurora Visibility',ring:4,yr:'2025',pull:'Where can you really see the aurora tonight?',d:'CASSINI Hackathon: OVATION oval fused with Sentinel cloud & light-pollution data.',tags:['Sentinel','OVATION','GIS'],url:'https://github.com/LissanKoirala/cassini-hackathon'},
+ {t:'Algo',ring:5,yr:'2026',pull:'Signals in, positions out.',d:'A live algorithmic trading system with a positions dashboard.',tags:['Python','Quant'],url:'https://algo.lissan.dev/positions-dashboard'},
+ {t:'Underground Live Map',ring:6,yr:'2025',pull:'Watch London move.',d:'A live map of the Tube and London buses in real time.',tags:['JavaScript'],url:'https://github.com/LissanKoirala/underground-live-map'},
+ {t:"God's Eye",ring:7,yr:'2024',pull:'Every camera, one eye.',d:'Multi-camera surveillance & person tracking, inspired by Fast & Furious.',tags:['OpenCV'],url:'https://godseye.lissan.dev'},
+ {t:'Solar System Simulation',ring:8,yr:'2023',pull:"Newton's laws, one time-step at a time.",d:'An N-body simulation studying Comet Halley\'s orbit, with papers.',tags:['Python','N-body'],url:'https://github.com/LissanKoirala/Solar-System-Simulation'},
+ {t:'Robot Vision',ring:9,yr:'2022',pull:'Sight, then motion.',d:'A 3D-printed robot controlled programmatically through a computer-vision pipeline.',tags:['Python','OpenCV'],url:'https://github.com/LissanKoirala/Robot-Vision'}
+];
+P.forEach((p,i)=>{p.ang=(-i/P.length)*Math.PI*2 - Math.PI/2; p.spd=1/(0.6+p.ring*0.9);});
+
+const c=document.getElementById('c'),x=c.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2),cx,cy,U;
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function resize(){W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
+  cx=W/2;cy=H/2+ (innerWidth<640?10:0)*DPR;U=Math.min(W,H)*0.045;}
+resize();addEventListener('resize',resize);
+let rot=0,speed=1,hover=-1;
+function ringR(r){return (2.2+r*1.02)*U;}
+function drawGear(cxg,cyg,R,teeth,rota,col,lw){
+  x.strokeStyle=col;x.lineWidth=lw;x.beginPath();
+  for(let i=0;i<=teeth*2;i++){const a=rota+ i/(teeth*2)*Math.PI*2;const rr=R*(i%2?1.08:1.0);
+    const px=cxg+Math.cos(a)*rr,py=cyg+Math.sin(a)*rr;i===0?x.moveTo(px,py):x.lineTo(px,py);}
+  x.closePath();x.stroke();
+}
+function draw(){
+  rot+= reduce?0:0.0022*speed;
+  x.clearRect(0,0,W,H);
+  x.fillStyle='rgba(8,20,34,1)';x.fillRect(0,0,W,H);
+  // faint blueprint grid
+  x.strokeStyle='rgba(120,180,240,.05)';x.lineWidth=DPR;
+  for(let gx=0;gx<W;gx+=40*DPR){x.beginPath();x.moveTo(gx,0);x.lineTo(gx,H);x.stroke();}
+  for(let gy=0;gy<H;gy+=40*DPR){x.beginPath();x.moveTo(0,gy);x.lineTo(W,gy);x.stroke();}
+  // radial ticks
+  x.strokeStyle='rgba(120,180,240,.12)';x.lineWidth=DPR;
+  for(let a=0;a<360;a+=15){const rad=a*Math.PI/180;const r1=ringR(9)+18*DPR,r2=r1+(a%45===0?16*DPR:8*DPR);
+    x.beginPath();x.moveTo(cx+Math.cos(rad)*r1,cy+Math.sin(rad)*r1);x.lineTo(cx+Math.cos(rad)*r2,cy+Math.sin(rad)*r2);x.stroke();}
+  // concentric orbit rings (dashed) + inner construction circles
+  P.forEach((p,i)=>{const R=ringR(p.ring);
+    x.setLineDash([2*DPR,6*DPR]);x.strokeStyle= hover===i?'rgba(232,185,107,.6)':'rgba(120,180,240,.22)';
+    x.lineWidth=DPR;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();x.setLineDash([]);});
+  // central gear cluster
+  drawGear(cx,cy,ringR(0)+8*DPR,26,rot*3,'rgba(232,185,107,.5)',DPR*1.4);
+  drawGear(cx,cy,ringR(0)-6*DPR,18,-rot*4,'rgba(120,180,240,.4)',DPR);
+  x.fillStyle='rgba(232,185,107,.15)';x.beginPath();x.arc(cx,cy,ringR(0)-2*DPR,0,7);x.fill();
+  x.fillStyle='var(--brass)';x.fillStyle='#e8b96b';x.font=`700 ${13*DPR}px var(--sans),sans-serif`;x.textAlign='center';
+  x.fillText('L·K',cx,cy+5*DPR);
+  // arms + bodies
+  P.forEach((p,i)=>{
+    p.ang += reduce?0:0.0016*speed*p.spd*8;
+    const R=ringR(p.ring);const px=cx+Math.cos(p.ang+rot)*R, py=cy+Math.sin(p.ang+rot)*R;
+    // arm
+    x.strokeStyle= hover===i?'rgba(232,185,107,.8)':'rgba(120,180,240,.3)';x.lineWidth=(hover===i?2:1)*DPR;
+    x.beginPath();x.moveTo(cx,cy);x.lineTo(px,py);x.stroke();
+    // small gear at joint
+    drawGear(px,py, (hover===i?12:9)*DPR, 10, p.ang*6, hover===i?'#e8b96b':'rgba(111,208,255,.7)', DPR);
+    x.fillStyle= hover===i?'rgba(232,185,107,.25)':'rgba(111,208,255,.12)';x.beginPath();x.arc(px,py,(hover===i?8:6)*DPR,0,7);x.fill();
+    x.fillStyle= hover===i?'#e8b96b':'#6fd0ff';x.beginPath();x.arc(px,py,2.5*DPR,0,7);x.fill();
+    // label + leader line to ring number
+    x.fillStyle= hover===i?'#eaf3ff':'rgba(207,228,255,.7)';
+    x.font=`${hover===i?600:400} ${12*DPR}px var(--mono),monospace`;
+    const side=Math.cos(p.ang+rot)>=0?1:-1;x.textAlign=side>0?'left':'right';
+    x.fillText(`${String(i+1).padStart(2,'0')} · ${p.t}`, px+side*(14*DPR), py-8*DPR);
+    p._x=px;p._y=py;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+const card=document.getElementById('card');
+function hit(mx,my){let b=-1,bd=1e9;P.forEach((p,i)=>{const d=Math.hypot(mx-p._x,my-p._y);if(d<20*DPR&&d<bd){bd=d;b=i;}});return b;}
+c.addEventListener('mousemove',e=>{const h=hit(e.clientX*DPR,e.clientY*DPR);
+  if(h!==hover){hover=h;if(h>=0)showCard(h);else card.classList.remove('show');}
+  c.style.cursor=h>=0?'pointer':'default';});
+c.addEventListener('click',e=>{const h=hit(e.clientX*DPR,e.clientY*DPR);if(h>=0)window.open(P[h].url,'_blank');});
+function showCard(i){const p=P[i];
+  card.innerHTML=`<div class="fig">FIG. ${String(i+1).padStart(2,'0')} · RING ${p.ring} · ${p.yr}</div>
+    <h2>${p.t}</h2><div class="pull">“${p.pull}”</div><p>${p.d}</p>
+    <div class="tags">${p.tags.join(' · ')}</div>
+    <a href="${p.url}" target="_blank" rel="noreferrer">Open drawing ↗</a>`;
+  card.classList.add('show');}
+document.getElementById('fast').onclick=()=>{speed=Math.min(5,speed+.5);document.getElementById('spd').textContent=speed.toFixed(1)+'×';};
+document.getElementById('slow').onclick=()=>{speed=Math.max(0,speed-.5);document.getElementById('spd').textContent=speed.toFixed(1)+'×';};
+</script>
+</body>
+</html>

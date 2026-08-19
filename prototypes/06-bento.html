@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lissan Koirala — Overview</title>
+<style>
+  :root{
+    --bg:#eef0f4; --card:#ffffff; --ink:#15171c; --mute:#6a7180; --line:#e3e6ec;
+    --violet:#6d5cff; --blue:#2d7bff; --teal:#12b5a5; --amber:#ffb020; --pink:#ff5a8a; --lime:#8bd450;
+    --radius:22px;
+    --font:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+    --sh:0 1px 2px rgba(20,23,28,.04),0 8px 24px -12px rgba(20,23,28,.14);
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#0c0e13;--card:#15181f;--ink:#eef1f7;--mute:#8b93a6;--line:#242833;
+      --sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6)}
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1200px;margin:0 auto;padding:clamp(18px,4vw,40px)}
+  a{color:inherit}
+  .mono{font-family:var(--mono)}
+  .mute{color:var(--mute)}
+
+  header.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+  .who{display:flex;align-items:center;gap:14px}
+  .av{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--violet),var(--pink));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:19px;box-shadow:var(--sh)}
+  .who b{font-size:16px;display:block}
+  .who span{font-size:13px;color:var(--mute)}
+  .bar .links{display:flex;gap:8px}
+  .bar .links a{font-size:13px;font-weight:600;text-decoration:none;padding:9px 15px;border-radius:11px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--sh)}
+  .bar .links a.dark{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;grid-auto-rows:minmax(120px,auto)}
+  @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:transform .18s}
+  .tile:hover{transform:translateY(-3px)}
+  .c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}
+  .r2{grid-row:span 2}
+  @media(max-width:900px){.c3,.c4{grid-column:span 2}}
+  @media(max-width:560px){.c2,.c3,.c4{grid-column:span 1}}
+
+  .label{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+  /* hero tile */
+  .hero{background:linear-gradient(135deg,var(--violet),#8f6bff 60%,var(--pink));color:#fff;border:none;
+    display:flex;flex-direction:column;justify-content:space-between}
+  .hero .label{color:rgba(255,255,255,.8)}
+  .hero h1{font-size:clamp(26px,3.2vw,40px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:14px 0}
+  .hero p{color:rgba(255,255,255,.9);font-size:15px;max-width:44ch}
+  .hero .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.16) 1.4px,transparent 1.4px);
+    background-size:20px 20px;opacity:.6;pointer-events:none}
+  .hero .row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative}
+  .hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:999px;
+    padding:6px 13px;font-size:12.5px;font-weight:600;backdrop-filter:blur(4px)}
+
+  /* stat tiles */
+  .stat{display:flex;flex-direction:column;justify-content:space-between}
+  .stat .big{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1}
+  .stat .cap{font-size:13px;color:var(--mute);margin-top:6px}
+  .stat.accent1{background:linear-gradient(140deg,rgba(45,123,255,.12),transparent);}
+  .stat .big.g1{color:var(--blue)}.stat .big.g2{color:var(--teal)}.stat .big.g3{color:var(--amber)}.stat .big.g4{color:var(--pink)}
+
+  /* project tile */
+  .proj{display:flex;flex-direction:column;text-decoration:none;color:inherit}
+  .proj .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:auto}
+  .proj .yr{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .proj .swatch{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px}
+  .proj h3{font-size:19px;font-weight:700;margin:14px 0 5px;letter-spacing:-.01em}
+  .proj .pull{font-size:13px;color:var(--mute);font-family:var(--mono)}
+  .proj p{font-size:13.5px;color:var(--mute);margin-top:8px}
+  .proj .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .proj .tags span{font-size:11px;font-weight:600;color:var(--mute);background:var(--bg);
+    border:1px solid var(--line);border-radius:7px;padding:3px 8px}
+  .proj .arr{position:absolute;top:20px;right:20px;opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px)}
+  .proj:hover .arr{opacity:1;transform:translateX(0)}
+
+  /* stack tile */
+  .stackwrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .stackwrap span{font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:9px;background:var(--bg);
+    border:1px solid var(--line)}
+
+  /* now tile */
+  .now li{display:flex;gap:10px;align-items:flex-start;font-size:14px;padding:7px 0;border-top:1px solid var(--line)}
+  .now li:first-of-type{border-top:none}
+  .now .d{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none}
+
+  /* contact tile */
+  .contact{background:var(--ink);color:var(--bg);border:none;display:flex;flex-direction:column;justify-content:center}
+  .contact h2{font-size:clamp(22px,2.6vw,32px);font-weight:800;letter-spacing:-.02em}
+  .contact a.mail{display:inline-block;margin-top:14px;font-weight:700;font-size:15px;color:var(--bg);
+    border-bottom:2px solid var(--pink);text-decoration:none;width:max-content}
+  .footnote{text-align:center;color:var(--mute);font-size:12.5px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="who">
+      <div class="av">LK</div>
+      <div><b>Lissan Koirala</b><span>Engineer · agents, quantum &amp; quant</span></div>
+    </div>
+    <div class="links">
+      <a href="https://github.com/LissanKoirala" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="mailto:lissanartist@gmail.com" class="dark">Get in touch</a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- HERO -->
+    <div class="tile hero c2 r2">
+      <div class="dots"></div>
+      <div class="label">Portfolio · lissan.dev</div>
+      <div>
+        <h1>I build systems that act on the real world.</h1>
+        <p>From LLM agents that make decisions, to quantum solvers that pick their own strategy, to trading systems that run live — I like the problems where the interesting part is whether it actually works.</p>
+      </div>
+      <div class="row">
+        <span class="pill">AI agents</span><span class="pill">Quantum</span>
+        <span class="pill">Quant trading</span><span class="pill">Computer vision</span>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="tile stat accent1"><div class="big g1">41/49</div><div class="cap">quantum circuits cracked</div></div>
+    <div class="tile stat"><div class="big g2">50+</div><div class="cap">public repositories</div></div>
+    <div class="tile stat"><div class="big g3">9</div><div class="cap">flagship builds</div></div>
+    <div class="tile stat"><div class="big g4">4</div><div class="cap">hackathons shipped</div></div>
+
+    <!-- PROJECTS (injected) -->
+    <div id="projects" style="display:contents"></div>
+
+    <!-- STACK -->
+    <div class="tile c2">
+      <div class="label">The stack</div>
+      <div class="stackwrap" id="stack"></div>
+    </div>
+
+    <!-- NOW -->
+    <div class="tile c2">
+      <div class="label">What I'm on right now</div>
+      <ul class="now">
+        <li><span class="d" style="background:var(--amber)"></span><span>Building <b>algo</b> — a live algorithmic trading system (algo.lissan.dev).</span></li>
+        <li><span class="d" style="background:var(--violet)"></span><span>Pushing <b>WorldEval</b> toward a full 99-match agent benchmark season.</span></li>
+        <li><span class="d" style="background:var(--teal)"></span><span>More quantum — Qiskit Fall Fest London &amp; the Fujitsu quantum challenge.</span></li>
+      </ul>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="tile contact c4">
+      <h2>Got a hard problem? Let's build it.</h2>
+      <a class="mail" href="mailto:lissanartist@gmail.com">lissanartist@gmail.com →</a>
+    </div>
+  </div>
+
+  <p class="footnote">© 2026 Lissan Koirala · lissan.dev · built as one of several design directions</p>
+</div>
+
+<script>
+const COLORS={violet:'#6d5cff',blue:'#2d7bff',teal:'#12b5a5',amber:'#ffb020',pink:'#ff5a8a',lime:'#8bd450'};
+const P=[
+  {t:"WorldEval / WorldArena",y:"2026",c:'violet',ic:"🌐",span:"c2",pull:"eval what a model does",
+   d:"An evaluation framework for LLM agents in deterministic 3D worlds — sealed plans, real consequences, an authoritative Godot sim.",
+   tags:["Python","Godot","FastAPI"],url:"https://github.com/LissanKoirala/WorldEval"},
+  {t:"Quantum Junction",y:"2026",c:'teal',ic:"⚛️",span:"c2",pull:"pick the simulator, then solve",
+   d:"A compute-aware pipeline that reads each obfuscated peaked quantum circuit and routes it to the cheapest attack. 41/49 solved.",
+   tags:["Qiskit","Tensor nets","Quimb"],url:"https://github.com/LissanKoirala/quantum-junction"},
+  {t:"Advisory Workbench",y:"2026",c:'pink',ic:"💹",span:"c2",pull:"agent proposes, human decides",
+   d:"SwissHacks 2026 build for SIX — a provenance-first wealth-advisory workbench. Every alert cited; nothing auto-executes.",
+   tags:["Next.js","FastAPI","Fintech"],url:"https://github.com/LissanKoirala/SwissHacks-Six"},
+  {t:"Aurora Visibility",y:"2025",c:'lime',ic:"🌌",span:"c2",pull:"see the lights tonight?",
+   d:"A CASSINI Hackathon pipeline fusing the OVATION oval model with Sentinel cloud &amp; light-pollution data into visibility maps.",
+   tags:["Sentinel","OVATION","GIS"],url:"https://github.com/LissanKoirala/cassini-hackathon"},
+  {t:"Algo",y:"2026",c:'amber',ic:"📈",span:"",pull:"signals in, positions out",
+   d:"A live algo trading system with a positions dashboard.",
+   tags:["Python","Quant"],url:"https://algo.lissan.dev/positions-dashboard"},
+  {t:"Underground Live Map",y:"2025",c:'blue',ic:"🚇",span:"",pull:"watch london move",
+   d:"A live map of the Tube &amp; London buses, in real time.",
+   tags:["JavaScript"],url:"https://github.com/LissanKoirala/underground-live-map"},
+  {t:"God's Eye",y:"2024",c:'violet',ic:"👁️",span:"",pull:"every camera, one eye",
+   d:"Multi-camera surveillance &amp; person tracking.",
+   tags:["OpenCV"],url:"https://godseye.lissan.dev"},
+  {t:"Solar System Sim",y:"2023",c:'amber',ic:"🪐",span:"",pull:"newton, step by step",
+   d:"N-body simulation studying Comet Halley's orbit, with papers.",
+   tags:["Python","Physics"],url:"https://github.com/LissanKoirala/Solar-System-Simulation"}
+];
+const STACK=["Python","JavaScript","Qiskit","Godot","FastAPI","Next.js","OpenCV","TensorFlow","Django","Docker","Linux","MATLAB","Java","Tensor networks"];
+
+document.getElementById('projects').innerHTML=P.map(p=>{
+  const col=COLORS[p.c];
+  return `<a class="tile proj ${p.span}" href="${p.url}" target="_blank" rel="noreferrer">
+    <span class="arr">↗</span>
+    <div class="topline">
+      <span class="swatch" style="background:${col}22;color:${col}">${p.ic}</span>
+      <span class="yr">${p.y}</span>
+    </div>
+    <h3>${p.t}</h3>
+    <div class="pull">${p.pull}</div>
+    <p>${p.d}</p>
+    <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+  </a>`;
+}).join('');
+document.getElementById('stack').innerHTML=STACK.map(s=>`<span>${s}</span>`).join('');
+</script>
+</body>
+</html>
